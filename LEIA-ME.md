@@ -26,8 +26,12 @@ A gata é montada como um fantoche: cada parte (corpo, cabeça, orelhas, rabo, p
 </script>
 ```
 
+**Poses:** `sentada`, `escrita` (troque com `cat.setPose('escrita')`)
+
+Na pose escrita ela escreve sozinha uns 5 segundos olhando o caderno, para, olha pra frente e volta a escrever.
+
 **Ações:** `piscar`, `feliz`, `curiosa`, `brilho` (clareza), `suspirar`, `tchau`, `vergonha`, `sim`, `nao`,
-`abanar` (rabo), `orelhas`, `pular`
+`abanar` (rabo), `orelhas`, `pular`, `escrever`
 
 **Olhos:** `abertos`, `meio`, `fechados`, `felizes`, `brilhantes`, `cima`
 **Boca:** `sorriso`, `aberta`, `o`
@@ -52,3 +56,10 @@ Estado disponível: `cabeca`, `orelhaEsq`, `orelhaDir`, `rabo`, `pata` (graus), 
 ## Ajustar a montagem
 Cada peça em `PARTS` tem centro (`cx`, `cy`), largura (`w`), ponto de giro (`pivot`) e inclinação fixa (`rot`),
 em pixels de uma tela de 1024 × 1536.
+
+## Poses
+Cada pose fica em `POSES` no `fantoche.js`, com sua lista de peças, expressões, pivô da cabeça (`neck`) e chão (`ground`).
+O `fallback` diz qual expressão usar quando a pose não tem a pedida (ex.: na escrita não há olhos "meio fechados", então a piscada usa os fechados).
+
+As peças da escrita começam com `e-` em `assets/pecas/`. Vieram do kit "Escrita_Kit_Animacao_v3" (cabeça, olhos, boca, orelhas,
+caderno e pata do caderno), do pacote v2 (corpo) e do próprio desenho da pose 26 (rabo e mão com lápis).

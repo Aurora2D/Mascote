@@ -7,6 +7,7 @@
  *   <script src="fantoche.js"></script>
  *   <gatinha-fantoche id="cat"></gatinha-fantoche>
  *   cat.play('tchau');  cat.play('feliz');  cat.setFace({ olhos: 'brilhantes' });
+ *   cat.setPose('escrita');   // poses: 'sentada', 'escrita'
  *
  * Coordenadas em pixels de uma tela de 1024 × 1536.
  */
@@ -14,8 +15,6 @@
   'use strict';
 
   const W = 1024, H = 1536;
-  const NECK = [505, 716];      // pivô da cabeça
-  const GROUND = [510, 1455];   // pivô da respiração / chão
 
   /* ---------- MONTAGEM: onde cada peça fica (centro, largura) e onde gira (pivot) ----------
    * Proporções medidas no desenho original da gatinha.
@@ -51,6 +50,42 @@
       aberta:  { img: 'boca-aberta',  cx: 505, cy: 626, w: 190 },
       o:       { img: 'boca-o',       cx: 505, cy: 618, w: 85 },
     },
+  };
+
+  /* ---------- POSE ESCRITA ----------
+   * Peças do kit "Escrita_Kit_Animacao_v3" (já registradas na tela) + corpo do pacote v2
+   * + rabo e mão com lápis recortados do desenho de referência da pose 26. */
+  const PARTS_ESCRITA = [
+    { id: 'rabo',        img: 'e-rabo',          cx: 889.5, cy: 1180, w: 267, pivot: [870, 1395], group: 'root' },
+    { id: 'corpo',       img: 'e-corpo',         cx: 478,   cy: 1087, w: 760, group: 'root' },
+    { id: 'orelhaEsq',   img: 'e-orelha-esq',    cx: 395,   cy: 233.5, w: 314, pivot: [455, 365], group: 'head' },
+    { id: 'orelhaDir',   img: 'e-orelha-dir',    cx: 793.5, cy: 367,  w: 319, pivot: [700, 465], group: 'head' },
+    { id: 'cabeca',      img: 'e-cabeca',        cx: 475,   cy: 528,  w: 806, group: 'head' },
+    { id: 'olhos',       slot: 'olhos', group: 'head' },
+    { id: 'boca',        slot: 'boca',  group: 'head' },
+    { id: 'caderno',     img: 'e-caderno',       cx: 507,   cy: 1008.5, w: 476, group: 'root' },
+    { id: 'pataCaderno', img: 'e-pata-caderno',  cx: 669,   cy: 1005, w: 308, group: 'root' },
+    { id: 'maoLapis',    img: 'e-mao-lapis',     cx: 347.5, cy: 850.5, w: 219, group: 'root', move: 'escrita' },
+  ];
+  const SLOTS_ESCRITA = {
+    olhos: {
+      abertos:  { img: 'e-olhos-abertos',  cx: 513.5, cy: 596.5, w: 401 },
+      fechados: { img: 'e-olhos-fechados', cx: 517,   cy: 608,   w: 384 },
+      caderno:  { img: 'e-olhos-caderno',  cx: 513.5, cy: 596.5, w: 401 },
+    },
+    boca: {
+      sorriso: { img: 'e-boca', cx: 488, cy: 722.5, w: 172 },
+    },
+  };
+
+  /* Cada pose: peças, expressões, pivô da cabeça (neck), chão (ground) e
+   * "fallback" = qual expressão usar quando a pose não tem a pedida. */
+  const POSES = {
+    sentada: { label: 'Sentada', parts: PARTS, slots: SLOTS, neck: [505, 716], ground: [510, 1455], shadow: 330,
+               fallback: {} },
+    escrita: { label: 'Escrevendo', parts: PARTS_ESCRITA, slots: SLOTS_ESCRITA, neck: [495, 800], ground: [515, 1452], shadow: 340,
+               write: true,
+               fallback: { meio: 'fechados', felizes: 'fechados', brilhantes: 'abertos', cima: 'abertos', aberta: 'sorriso', o: 'sorriso' } },
   };
 
   const ease = {
@@ -133,6 +168,12 @@
       const d = 1.0; if (t > d) return false;
       s.cabecaY += Math.sin((t / d) * Math.PI * 4) * 8 * (1 - t / d);
     },
+    escrever(t, s) { // escreve com vontade (na pose escrita)
+      const d = 3; if (t > d) return false;
+      const k = ease.bump(t / d);
+      s.escrevendo = 1; s.escritaX += Math.sin(t * 16) * 4 * k; s.escritaY += Math.abs(Math.cos(t * 8)) * 3 * k;
+      s.cabeca += Math.sin(t * 8) * 1.2 * k;
+    },
     nao(t, s) {
       const d = 1.1; if (t > d) return false;
       s.cabeca += Math.sin((t / d) * Math.PI * 4) * 6 * (1 - t / d);
@@ -154,13 +195,18 @@
       this.ctx = this.canvas.getContext('2d');
       this.imgs = {}; this.running = []; this.time = 0; this.nextBlink = 1.2; this.nextEar = 4;
       this.face = { olhos: 'abertos', boca: 'sorriso' };
+      this.poseName = this.getAttribute('pose') || 'sentada'; this.prevPose = null; this.fade = 1;
+      this.buf = [document.createElement('canvas'), document.createElement('canvas')];
       this.basePath = this.getAttribute('src-base') || 'assets/pecas/';
       this.ready = this._init();
     }
 
     async _init() {
-      const names = new Set(PARTS.filter((p) => p.img).map((p) => p.img));
-      Object.values(SLOTS).forEach((v) => Object.values(v).forEach((o) => names.add(o.img)));
+      const names = new Set();
+      for (const P of Object.values(POSES)) {
+        P.parts.forEach((p) => p.img && names.add(p.img));
+        Object.values(P.slots).forEach((v) => Object.values(v).forEach((o) => names.add(o.img)));
+      }
       await Promise.all([...names].map(async (n) => {
         const src = (window.FANTOCHE_ASSETS && window.FANTOCHE_ASSETS[n]) || (this.basePath + n + '.webp');
         this.imgs[n] = await loadImage(src);
@@ -177,6 +223,7 @@
       const dpr = Math.min(window.devicePixelRatio || 1, 2.5);
       this.canvas.width = Math.max(1, Math.round(this.clientWidth * dpr));
       this.canvas.height = Math.max(1, Math.round(this.clientHeight * dpr));
+      for (const b of this.buf) { b.width = this.canvas.width; b.height = this.canvas.height; }
     }
 
     /* ---------- API ---------- */
@@ -186,6 +233,14 @@
       if (!fn) { console.warn('Ação desconhecida:', name); return Promise.resolve(); }
       return new Promise((resolve) => this.running.push({ fn, t0: this.time, resolve }));
     }
+    /** Troca de pose com transição suave: cat.setPose('escrita') */
+    setPose(name) {
+      if (!POSES[name]) { console.warn('Pose desconhecida:', name); return; }
+      if (name === this.poseName) return;
+      this.prevPose = this.poseName; this.poseName = name; this.fade = 0;
+      this.dispatchEvent(new CustomEvent('pose', { detail: name }));
+    }
+    get poses() { return Object.keys(POSES); }
     /** Expressão "de repouso": cat.setFace({ olhos: 'brilhantes', boca: 'o' }) */
     setFace(f) { Object.assign(this.face, f); }
     addAction(name, fn) { ACTIONS[name] = fn; }
@@ -201,18 +256,31 @@
         rabo: Math.sin(t * 1.7) * 5 + Math.sin(t * 0.6) * 2,
         pata: 0, respira: Math.sin(t * Math.PI * 2 * 0.25), pulo: 0, amassa: 0,
         olhos: this.face.olhos, boca: this.face.boca, bochechas: 0, pataLevantada: 0,
+        escritaX: 0, escritaY: 0, escrevendo: 0,
       };
+      // escrita automática: escreve ~5 s olhando o caderno, depois para ~2 s e olha pra frente
+      if (POSES[this.poseName].write) {
+        const ph = t % 7;
+        if (ph < 5) {
+          const on = Math.min(1, ph / 0.3, (5 - ph) / 0.3);
+          s.escrevendo = on;
+          s.escritaX += Math.sin(t * 13) * 3.5 * on;
+          s.escritaY += Math.abs(Math.cos(t * 6.5)) * 2.5 * on;
+          s.cabeca += Math.sin(t * 6.5) * 0.6 * on;
+        }
+      }
       this.running = this.running.filter((r) => {
         if (r.fn(this.time - r.t0, s) === false) { r.resolve(); return false; }
         return true;
       });
+      if (s.escrevendo > 0.5 && s.olhos === 'abertos') s.olhos = 'caderno';
       return s;
     }
 
     _drawImg(name, cx, cy, w, alpha = 1) {
       const im = this.imgs[name]; if (!im || alpha <= 0) return;
       const h = w * im.height / im.width;
-      const c = this.ctx; const a = c.globalAlpha;
+      const c = this._ctx || this.ctx; const a = c.globalAlpha;
       c.globalAlpha = a * alpha;
       c.drawImage(im, cx - w / 2, cy - h / 2, w, h);
       c.globalAlpha = a;
@@ -225,17 +293,36 @@
       if ((this.nextEar -= dt) <= 0) { this.play('orelhas'); this.nextEar = 5 + Math.random() * 7; }
 
       const s = this._state();
-      const c = this.ctx, D = Math.PI / 180;
-      const k = this.canvas.width / W;
+      const c = this.ctx;
       c.setTransform(1, 0, 0, 1, 0, 0);
       c.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      if (this.fade < 1) this.fade = Math.min(1, this.fade + dt / 0.45);
+      if (this.fade >= 1 || !this.prevPose) {
+        this._drawPose(c, POSES[this.poseName], s);
+      } else { // transição: desenha cada pose num buffer e mistura
+        const f = ease.inOut(this.fade);
+        const [b0, b1] = this.buf;
+        this._drawPose(b0.getContext('2d'), POSES[this.prevPose], s, true);
+        this._drawPose(b1.getContext('2d'), POSES[this.poseName], s, true);
+        c.globalAlpha = 1 - f; c.drawImage(b0, 0, 0);
+        c.globalAlpha = f; c.drawImage(b1, 0, 0);
+        c.globalAlpha = 1;
+      }
+    }
+
+    _drawPose(c, P, s, clear) {
+      const k = this.canvas.width / W;
+      const NECK = P.neck, GROUND = P.ground;
+      c.setTransform(1, 0, 0, 1, 0, 0);
+      if (clear) c.clearRect(0, 0, this.canvas.width, this.canvas.height);
       c.imageSmoothingEnabled = true; c.imageSmoothingQuality = 'high';
+      this._ctx = c;
 
       // sombra
       c.setTransform(k, 0, 0, k, 0, 0);
       const sh = 1 - Math.min(s.pulo, 80) / 200;
       c.fillStyle = 'rgba(84,62,102,0.16)';
-      c.beginPath(); c.ellipse(GROUND[0], GROUND[1], 330 * sh, 34 * sh, 0, 0, Math.PI * 2); c.fill();
+      c.beginPath(); c.ellipse(GROUND[0], GROUND[1], P.shadow * sh, 34 * sh, 0, 0, Math.PI * 2); c.fill();
 
       // transformação do corpo (respiração, pulo, amassar)
       const sy = 1 + s.respira * 0.008 - s.amassa;
@@ -244,7 +331,7 @@
       const headM = rootM.translate(NECK[0], NECK[1] + s.cabecaY).rotate(s.cabeca).translate(-NECK[0], -NECK[1]);
       const base = new DOMMatrix().scale(k, k);
 
-      for (const p of PARTS) {
+      for (const p of P.parts) {
         const g = base.multiply(p.group === 'head' ? headM : rootM);
         let m = g;
         let ang = p.rot || 0, alpha = 1;
@@ -255,9 +342,12 @@
         if (p.id === 'pataDir') alpha = 1 - s.pataLevantada;
         if (p.id === 'bochechas') alpha = s.bochechas * 0.9;
         if (ang && p.pivot) m = g.translate(p.pivot[0], p.pivot[1]).rotate(ang).translate(-p.pivot[0], -p.pivot[1]);
+        if (p.move === 'escrita') m = m.translate(s.escritaX, s.escritaY);
         c.setTransform(m);
         if (p.slot) {
-          const v = SLOTS[p.slot][s[p.slot]] || SLOTS[p.slot][Object.keys(SLOTS[p.slot])[0]];
+          const set = P.slots[p.slot];
+          const want = s[p.slot];
+          const v = set[want] || set[P.fallback[want]] || set[Object.keys(set)[0]];
           this._drawImg(v.img, v.cx, v.cy, v.w);
         } else this._drawImg(p.img, p.cx, p.cy, p.w, alpha);
       }
@@ -266,6 +356,6 @@
     disconnectedCallback() { cancelAnimationFrame(this._raf); }
   }
 
-  GatinhaFantoche.PARTS = PARTS; GatinhaFantoche.SLOTS = SLOTS; GatinhaFantoche.ACTIONS = ACTIONS;
+  GatinhaFantoche.POSES = POSES; GatinhaFantoche.PARTS = PARTS; GatinhaFantoche.SLOTS = SLOTS; GatinhaFantoche.ACTIONS = ACTIONS;
   if (!customElements.get('gatinha-fantoche')) customElements.define('gatinha-fantoche', GatinhaFantoche);
 })();

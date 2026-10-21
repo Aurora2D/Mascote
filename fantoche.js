@@ -26,7 +26,7 @@
     { id: 'orelhaEsq',  img: 'orelha-esq',     cx: 322, cy: 318,  w: 255, pivot: [375, 450],  rot: -9, group: 'head' },
     { id: 'orelhaDir',  img: 'orelha-dir',     cx: 688, cy: 322,  w: 265, pivot: [625, 445],  rot: 7, group: 'head' },
     { id: 'corpo',      img: 'corpo',          cx: 510, cy: 1075, w: 730, group: 'root' },
-    { id: 'patasTras',  img: 'patas-tras',     cx: 505, cy: 1345, w: 470, group: 'root' },
+    { id: 'patasTras',  img: 'patas-tras',     cx: 505, cy: 1335, w: 517, group: 'root' },
     { id: 'pataEsq',    img: 'pata-esq',       cx: 395, cy: 1057, w: 300, pivot: [395, 1057], rot: 8.7, group: 'root' },  // espelho da pata branca
     { id: 'pataDir',    img: 'pata-dir',       cx: 610, cy: 1058, w: 245, pivot: [610, 700],  rot: -3.4, group: 'root' },
     { id: 'cabeca',     img: 'cabeca',         cx: 505, cy: 478,  w: 615, group: 'head' },

@@ -56,13 +56,13 @@
    * Peças do "Escrita_Kit_v4": separadas do próprio desenho original (sem redesenho), com as partes
    * escondidas reconstruídas por baixo. Olhos fechados: pálpebra pintada com o pelo da testa + risquinho do kit v3. */
   const PARTS_ESCRITA = [
-    { id: 'rabo',      img: 'e-rabo',         cx: 809,   cy: 1185.5, w: 430, pivot: [700, 1400], group: 'root' },
-    { id: 'base',      img: 'e-base',         cx: 483,   cy: 1077,   w: 778, group: 'root' },
-    { id: 'orelhaEsq', img: 'e-orelha-rosa',  cx: 363.5, cy: 242,    w: 369, pivot: [495, 385], group: 'head' },
-    { id: 'orelhaDir', img: 'e-orelha-lilas', cx: 786,   cy: 365,    w: 318, pivot: [675, 485], group: 'head' },
+    { id: 'rabo',      img: 'e-rabo',         cx: 809.5, cy: 1186,   w: 429, pivot: [700, 1400], group: 'root' },
+    { id: 'base',      img: 'e-base',         cx: 482.5, cy: 1078,   w: 777, group: 'root' },
+    { id: 'orelhaEsq', img: 'e-orelha-rosa',  cx: 363.5, cy: 241.5,  w: 367, pivot: [495, 385], group: 'head' },
+    { id: 'orelhaDir', img: 'e-orelha-lilas', cx: 787.5, cy: 365,    w: 317, pivot: [675, 485], group: 'head' },
     { id: 'cabeca',    img: 'e-cabeca',       cx: 469,   cy: 557,    w: 794, group: 'head' },
     { id: 'olhos',     slot: 'olhos', group: 'head' },
-    { id: 'maoLapis',  img: 'e-mao-lapis',    cx: 297.5, cy: 926,    w: 311, group: 'root', move: 'escrita' },
+    { id: 'maoLapis',  img: 'e-mao-lapis',    cx: 298,   cy: 926,    w: 310, group: 'root', move: 'escrita' },
   ];
   const SLOTS_ESCRITA = {
     olhos: {
@@ -78,7 +78,7 @@
   const POSES = {
     sentada: { label: 'Sentada', parts: PARTS, slots: SLOTS, neck: [505, 716], ground: [510, 1455], shadow: 330,
                fallback: {} },
-    escrita: { label: 'Escrevendo', parts: PARTS_ESCRITA, slots: SLOTS_ESCRITA, neck: [470, 830], ground: [515, 1452], shadow: 340, scale: 0.86,
+    escrita: { label: 'Escrevendo', parts: PARTS_ESCRITA, slots: SLOTS_ESCRITA, neck: [470, 830], ground: [515, 1452], shadow: 340, scale: 0.86, earScale: 0.45,
                write: true,
                fallback: { felizes: 'fechados', brilhantes: 'abertos', cima: 'abertos', caderno: 'abertos', aberta: 'sorriso', o: 'sorriso' } },
   };
@@ -333,8 +333,8 @@
         let m = g;
         let ang = p.rot || 0, alpha = 1;
         if (p.id === 'rabo') ang += s.rabo;
-        if (p.id === 'orelhaEsq') ang += s.orelhaEsq;
-        if (p.id === 'orelhaDir') ang += s.orelhaDir;
+        if (p.id === 'orelhaEsq') ang += s.orelhaEsq * (P.earScale || 1);
+        if (p.id === 'orelhaDir') ang += s.orelhaDir * (P.earScale || 1);
         if (p.id === 'pataLevantada') { ang += s.pata + (1 - s.pataLevantada) * 35; alpha = s.pataLevantada; }
         if (p.id === 'pataDir') alpha = 1 - s.pataLevantada;
         if (p.id === 'bochechas') alpha = s.bochechas * 0.9;

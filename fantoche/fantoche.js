@@ -22,13 +22,13 @@
    * group: 'root' = acompanha o corpo; 'head' = acompanha a cabeça
    * Ordem do array = ordem de desenho (de trás pra frente). */
   const PARTS = [
-    { id: 'rabo',       img: 'rabo',           cx: 880, cy: 1195, w: 200, pivot: [825, 1410], group: 'root' },
-    { id: 'orelhaEsq',  img: 'orelha-esq',     cx: 305, cy: 300,  w: 255, pivot: [365, 440],  group: 'head' },
-    { id: 'orelhaDir',  img: 'orelha-dir',     cx: 700, cy: 305,  w: 265, pivot: [630, 435],  group: 'head' },
+    { id: 'rabo',       img: 'rabo',           cx: 838, cy: 1085, w: 235, pivot: [790, 1330], rot: 8, group: 'root' },
+    { id: 'orelhaEsq',  img: 'orelha-esq',     cx: 322, cy: 318,  w: 255, pivot: [375, 450],  rot: -9, group: 'head' },
+    { id: 'orelhaDir',  img: 'orelha-dir',     cx: 688, cy: 322,  w: 265, pivot: [625, 445],  rot: 7, group: 'head' },
     { id: 'corpo',      img: 'corpo',          cx: 510, cy: 1075, w: 730, group: 'root' },
     { id: 'patasTras',  img: 'patas-tras',     cx: 505, cy: 1345, w: 470, group: 'root' },
-    { id: 'pataEsq',    img: 'pata-esq',       cx: 440, cy: 1062, w: 300, pivot: [440, 700],  group: 'root' },
-    { id: 'pataDir',    img: 'pata-dir',       cx: 580, cy: 1058, w: 245, pivot: [580, 700],  group: 'root' },
+    { id: 'pataEsq',    img: 'pata-esq',       cx: 410, cy: 1062, w: 300, pivot: [410, 700],  group: 'root' },
+    { id: 'pataDir',    img: 'pata-dir',       cx: 610, cy: 1058, w: 245, pivot: [610, 700],  group: 'root' },
     { id: 'pataLevantada', img: 'pata-levantada', cx: 705, cy: 800, w: 350, pivot: [615, 985], group: 'root' },
     { id: 'cabeca',     img: 'cabeca',         cx: 505, cy: 478,  w: 615, group: 'head' },
     { id: 'bochechas',  img: 'bochechas',      cx: 506, cy: 562,  w: 415, group: 'head' },
@@ -247,11 +247,11 @@
       for (const p of PARTS) {
         const g = base.multiply(p.group === 'head' ? headM : rootM);
         let m = g;
-        let ang = 0, alpha = 1;
-        if (p.id === 'rabo') ang = s.rabo;
-        if (p.id === 'orelhaEsq') ang = s.orelhaEsq;
-        if (p.id === 'orelhaDir') ang = s.orelhaDir;
-        if (p.id === 'pataLevantada') { ang = s.pata + (1 - s.pataLevantada) * 35; alpha = s.pataLevantada; }
+        let ang = p.rot || 0, alpha = 1;
+        if (p.id === 'rabo') ang += s.rabo;
+        if (p.id === 'orelhaEsq') ang += s.orelhaEsq;
+        if (p.id === 'orelhaDir') ang += s.orelhaDir;
+        if (p.id === 'pataLevantada') { ang += s.pata + (1 - s.pataLevantada) * 35; alpha = s.pataLevantada; }
         if (p.id === 'pataDir') alpha = 1 - s.pataLevantada;
         if (p.id === 'bochechas') alpha = s.bochechas * 0.9;
         if (ang && p.pivot) m = g.translate(p.pivot[0], p.pivot[1]).rotate(ang).translate(-p.pivot[0], -p.pivot[1]);

@@ -53,29 +53,22 @@
   };
 
   /* ---------- POSE ESCRITA ----------
-   * Peças do kit "Escrita_Kit_Animacao_v3" (já registradas na tela) + corpo do pacote v2
-   * + rabo e mão com lápis recortados do desenho de referência da pose 26. */
+   * Feita a partir do desenho original da pose: a base (corpo, caderno e pata do caderno) fica parada,
+   * e cabeça, rabo e mão com lápis são recortes do próprio desenho que se mexem por cima.
+   * Os olhos fechados são uma "pálpebra" pintada com o pelo da testa + o risquinho do kit v3. */
   const PARTS_ESCRITA = [
-    { id: 'rabo',        img: 'e-rabo',          cx: 889.5, cy: 1180, w: 267, pivot: [870, 1395], group: 'root' },
-    { id: 'corpo',       img: 'e-corpo',         cx: 478,   cy: 1087, w: 760, group: 'root' },
-    { id: 'orelhaEsq',   img: 'e-orelha-esq',    cx: 395,   cy: 233.5, w: 314, pivot: [455, 365], group: 'head' },
-    { id: 'orelhaDir',   img: 'e-orelha-dir',    cx: 793.5, cy: 367,  w: 319, pivot: [700, 465], group: 'head' },
-    { id: 'cabeca',      img: 'e-cabeca',        cx: 475,   cy: 528,  w: 806, group: 'head' },
-    { id: 'olhos',       slot: 'olhos', group: 'head' },
-    { id: 'boca',        slot: 'boca',  group: 'head' },
-    { id: 'caderno',     img: 'e-caderno',       cx: 507,   cy: 1008.5, w: 476, group: 'root' },
-    { id: 'pataCaderno', img: 'e-pata-caderno',  cx: 669,   cy: 1005, w: 308, group: 'root' },
-    { id: 'maoLapis',    img: 'e-mao-lapis',     cx: 347.5, cy: 850.5, w: 219, group: 'root', move: 'escrita' },
+    { id: 'rabo',     img: 'e-rabo',      cx: 922.5, cy: 1180, w: 203, pivot: [880, 1390], group: 'root' },
+    { id: 'base',     img: 'e-base',      cx: 471,   cy: 1082, w: 798, group: 'root' },
+    { id: 'cabeca',   img: 'e-cabeca',    cx: 510,   cy: 443,  w: 870, group: 'head' },
+    { id: 'olhos',    slot: 'olhos', group: 'head' },
+    { id: 'maoLapis', img: 'e-mao-lapis', cx: 347.5, cy: 850,  w: 221, group: 'root', move: 'escrita' },
   ];
   const SLOTS_ESCRITA = {
     olhos: {
-      abertos:  { img: 'e-olhos-abertos',  cx: 513.5, cy: 596.5, w: 401 },
-      fechados: { img: 'e-olhos-fechados', cx: 517,   cy: 608,   w: 384 },
-      caderno:  { img: 'e-olhos-caderno',  cx: 513.5, cy: 596.5, w: 401 },
+      abertos:  { img: null },   // os olhos abertos já estão desenhados na cabeça
+      fechados: { img: 'e-olhos-fechados', cx: 515.5, cy: 597, w: 453 },
     },
-    boca: {
-      sorriso: { img: 'e-boca', cx: 488, cy: 722.5, w: 172 },
-    },
+    boca: { sorriso: { img: null } },
   };
 
   /* Cada pose: peças, expressões, pivô da cabeça (neck), chão (ground) e
@@ -83,9 +76,9 @@
   const POSES = {
     sentada: { label: 'Sentada', parts: PARTS, slots: SLOTS, neck: [505, 716], ground: [510, 1455], shadow: 330,
                fallback: {} },
-    escrita: { label: 'Escrevendo', parts: PARTS_ESCRITA, slots: SLOTS_ESCRITA, neck: [495, 800], ground: [515, 1452], shadow: 340,
-               write: true,
-               fallback: { meio: 'fechados', felizes: 'fechados', brilhantes: 'abertos', cima: 'abertos', aberta: 'sorriso', o: 'sorriso' } },
+    escrita: { label: 'Escrevendo', parts: PARTS_ESCRITA, slots: SLOTS_ESCRITA, neck: [480, 785], ground: [515, 1452], shadow: 340,
+               write: true, headScale: 0.6,
+               fallback: { meio: 'fechados', felizes: 'fechados', brilhantes: 'abertos', cima: 'abertos', caderno: 'abertos', aberta: 'sorriso', o: 'sorriso' } },
   };
 
   const ease = {
@@ -205,7 +198,7 @@
       const names = new Set();
       for (const P of Object.values(POSES)) {
         P.parts.forEach((p) => p.img && names.add(p.img));
-        Object.values(P.slots).forEach((v) => Object.values(v).forEach((o) => names.add(o.img)));
+        Object.values(P.slots).forEach((v) => Object.values(v).forEach((o) => o.img && names.add(o.img)));
       }
       await Promise.all([...names].map(async (n) => {
         const src = (window.FANTOCHE_ASSETS && window.FANTOCHE_ASSETS[n]) || (this.basePath + n + '.webp');
@@ -328,7 +321,8 @@
       const sy = 1 + s.respira * 0.008 - s.amassa;
       const sx = 1 - s.respira * 0.003 + s.amassa * 0.6;
       const rootM = new DOMMatrix().translate(GROUND[0], GROUND[1] - s.pulo).scale(sx, sy).translate(-GROUND[0], -GROUND[1]);
-      const headM = rootM.translate(NECK[0], NECK[1] + s.cabecaY).rotate(s.cabeca).translate(-NECK[0], -NECK[1]);
+      const hs = P.headScale || 1;
+      const headM = rootM.translate(NECK[0], NECK[1] + s.cabecaY * hs).rotate(s.cabeca * hs).translate(-NECK[0], -NECK[1]);
       const base = new DOMMatrix().scale(k, k);
 
       for (const p of P.parts) {
@@ -348,7 +342,7 @@
           const set = P.slots[p.slot];
           const want = s[p.slot];
           const v = set[want] || set[P.fallback[want]] || set[Object.keys(set)[0]];
-          this._drawImg(v.img, v.cx, v.cy, v.w);
+          if (v.img) this._drawImg(v.img, v.cx, v.cy, v.w);
         } else this._drawImg(p.img, p.cx, p.cy, p.w, alpha);
       }
     }

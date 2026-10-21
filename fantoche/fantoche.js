@@ -14,23 +14,24 @@
   'use strict';
 
   const W = 1024, H = 1536;
-  const NECK = [497, 700];      // pivô da cabeça
+  const NECK = [505, 716];      // pivô da cabeça
   const GROUND = [510, 1455];   // pivô da respiração / chão
 
   /* ---------- MONTAGEM: onde cada peça fica (centro, largura) e onde gira (pivot) ----------
+   * Proporções medidas no desenho original da gatinha.
    * group: 'root' = acompanha o corpo; 'head' = acompanha a cabeça
    * Ordem do array = ordem de desenho (de trás pra frente). */
   const PARTS = [
-    { id: 'rabo',       img: 'rabo',           cx: 870, cy: 1180, w: 190, pivot: [815, 1400], group: 'root' },
-    { id: 'orelhaEsq',  img: 'orelha-esq',     cx: 300, cy: 300,  w: 260, pivot: [360, 440],  group: 'head' },
-    { id: 'orelhaDir',  img: 'orelha-dir',     cx: 690, cy: 300,  w: 270, pivot: [620, 430],  group: 'head' },
-    { id: 'corpo',      img: 'corpo',          cx: 510, cy: 1060, w: 720, group: 'root' },
-    { id: 'patasTras',  img: 'patas-tras',     cx: 510, cy: 1395, w: 560, group: 'root' },
-    { id: 'pataEsq',    img: 'pata-esq',       cx: 400, cy: 1110, w: 250, pivot: [400, 800],  group: 'root' },
-    { id: 'pataDir',    img: 'pata-dir',       cx: 580, cy: 1120, w: 200, pivot: [580, 810],  group: 'root' },
-    { id: 'pataLevantada', img: 'pata-levantada', cx: 690, cy: 790, w: 320, pivot: [610, 960], group: 'root' },
-    { id: 'cabeca',     img: 'cabeca',         cx: 495, cy: 470,  w: 640, group: 'head' },
-    { id: 'bochechas',  img: 'bochechas',      cx: 497, cy: 545,  w: 360, group: 'head' },
+    { id: 'rabo',       img: 'rabo',           cx: 880, cy: 1195, w: 200, pivot: [825, 1410], group: 'root' },
+    { id: 'orelhaEsq',  img: 'orelha-esq',     cx: 305, cy: 300,  w: 255, pivot: [365, 440],  group: 'head' },
+    { id: 'orelhaDir',  img: 'orelha-dir',     cx: 700, cy: 305,  w: 265, pivot: [630, 435],  group: 'head' },
+    { id: 'corpo',      img: 'corpo',          cx: 510, cy: 1075, w: 730, group: 'root' },
+    { id: 'patasTras',  img: 'patas-tras',     cx: 505, cy: 1345, w: 470, group: 'root' },
+    { id: 'pataEsq',    img: 'pata-esq',       cx: 440, cy: 1062, w: 300, pivot: [440, 700],  group: 'root' },
+    { id: 'pataDir',    img: 'pata-dir',       cx: 580, cy: 1058, w: 245, pivot: [580, 700],  group: 'root' },
+    { id: 'pataLevantada', img: 'pata-levantada', cx: 705, cy: 800, w: 350, pivot: [615, 985], group: 'root' },
+    { id: 'cabeca',     img: 'cabeca',         cx: 505, cy: 478,  w: 615, group: 'head' },
+    { id: 'bochechas',  img: 'bochechas',      cx: 506, cy: 562,  w: 415, group: 'head' },
     { id: 'olhos',      slot: 'olhos', group: 'head' },
     { id: 'boca',       slot: 'boca',  group: 'head' },
   ];
@@ -38,17 +39,17 @@
   /* Variações de olhos e boca (já calibradas pra caber no mesmo lugar) */
   const SLOTS = {
     olhos: {
-      abertos:    { img: 'olhos-abertos',    cx: 497, cy: 478, w: 400 },
-      meio:       { img: 'olhos-meio',       cx: 496, cy: 482, w: 402 },
-      fechados:   { img: 'olhos-fechados',   cx: 497, cy: 485, w: 329 },
-      felizes:    { img: 'olhos-felizes',    cx: 497, cy: 478, w: 357 },
-      brilhantes: { img: 'olhos-brilhantes', cx: 497, cy: 478, w: 389 },
-      cima:       { img: 'olhos-cima',       cx: 497, cy: 478, w: 351 },
+      abertos:    { img: 'olhos-abertos',    cx: 508, cy: 485, w: 462 },
+      meio:       { img: 'olhos-meio',       cx: 507, cy: 490, w: 464 },
+      fechados:   { img: 'olhos-fechados',   cx: 508, cy: 493, w: 380 },
+      felizes:    { img: 'olhos-felizes',    cx: 508, cy: 485, w: 412 },
+      brilhantes: { img: 'olhos-brilhantes', cx: 508, cy: 485, w: 449 },
+      cima:       { img: 'olhos-cima',       cx: 508, cy: 485, w: 405 },
     },
     boca: {
-      sorriso: { img: 'boca-sorriso', cx: 497, cy: 588, w: 105 },
-      aberta:  { img: 'boca-aberta',  cx: 497, cy: 610, w: 120 },
-      o:       { img: 'boca-o',       cx: 497, cy: 605, w: 55 },
+      sorriso: { img: 'boca-sorriso', cx: 505, cy: 606, w: 170 },
+      aberta:  { img: 'boca-aberta',  cx: 505, cy: 626, w: 190 },
+      o:       { img: 'boca-o',       cx: 505, cy: 618, w: 85 },
     },
   };
 
@@ -234,7 +235,7 @@
       c.setTransform(k, 0, 0, k, 0, 0);
       const sh = 1 - Math.min(s.pulo, 80) / 200;
       c.fillStyle = 'rgba(84,62,102,0.16)';
-      c.beginPath(); c.ellipse(GROUND[0], GROUND[1], 310 * sh, 34 * sh, 0, 0, Math.PI * 2); c.fill();
+      c.beginPath(); c.ellipse(GROUND[0], GROUND[1], 330 * sh, 34 * sh, 0, 0, Math.PI * 2); c.fill();
 
       // transformação do corpo (respiração, pulo, amassar)
       const sy = 1 + s.respira * 0.008 - s.amassa;

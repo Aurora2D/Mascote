@@ -53,19 +53,21 @@
   };
 
   /* ---------- POSE ESCRITA ----------
-   * Feita a partir do desenho original da pose: a base (corpo, caderno e pata do caderno) fica parada,
-   * e cabeça, rabo e mão com lápis são recortes do próprio desenho que se mexem por cima.
-   * Os olhos fechados são uma "pálpebra" pintada com o pelo da testa + o risquinho do kit v3. */
+   * Peças do "Escrita_Kit_v4": separadas do próprio desenho original (sem redesenho), com as partes
+   * escondidas reconstruídas por baixo. Olhos fechados: pálpebra pintada com o pelo da testa + risquinho do kit v3. */
   const PARTS_ESCRITA = [
-    { id: 'rabo',     img: 'e-rabo',      cx: 922.5, cy: 1180, w: 203, pivot: [880, 1390], group: 'root' },
-    { id: 'base',     img: 'e-base',      cx: 471,   cy: 1082, w: 798, group: 'root' },
-    { id: 'cabeca',   img: 'e-cabeca',    cx: 510,   cy: 443,  w: 870, group: 'head' },
-    { id: 'olhos',    slot: 'olhos', group: 'head' },
-    { id: 'maoLapis', img: 'e-mao-lapis', cx: 347.5, cy: 850,  w: 221, group: 'root', move: 'escrita' },
+    { id: 'rabo',      img: 'e-rabo',         cx: 809,   cy: 1185.5, w: 430, pivot: [700, 1400], group: 'root' },
+    { id: 'base',      img: 'e-base',         cx: 483,   cy: 1077,   w: 778, group: 'root' },
+    { id: 'orelhaEsq', img: 'e-orelha-rosa',  cx: 363.5, cy: 242,    w: 369, pivot: [495, 385], group: 'head' },
+    { id: 'orelhaDir', img: 'e-orelha-lilas', cx: 786,   cy: 365,    w: 318, pivot: [675, 485], group: 'head' },
+    { id: 'cabeca',    img: 'e-cabeca',       cx: 469,   cy: 557,    w: 794, group: 'head' },
+    { id: 'olhos',     slot: 'olhos', group: 'head' },
+    { id: 'maoLapis',  img: 'e-mao-lapis',    cx: 297.5, cy: 926,    w: 311, group: 'root', move: 'escrita' },
   ];
   const SLOTS_ESCRITA = {
     olhos: {
       abertos:  { img: null },   // os olhos abertos já estão desenhados na cabeça
+      meio:     { img: 'e-olhos-meio',     cx: 530,   cy: 598, w: 458 },
       fechados: { img: 'e-olhos-fechados', cx: 515.5, cy: 597, w: 453 },
     },
     boca: { sorriso: { img: null } },
@@ -76,9 +78,9 @@
   const POSES = {
     sentada: { label: 'Sentada', parts: PARTS, slots: SLOTS, neck: [505, 716], ground: [510, 1455], shadow: 330,
                fallback: {} },
-    escrita: { label: 'Escrevendo', parts: PARTS_ESCRITA, slots: SLOTS_ESCRITA, neck: [480, 785], ground: [515, 1452], shadow: 340,
-               write: true, headScale: 0.6,
-               fallback: { meio: 'fechados', felizes: 'fechados', brilhantes: 'abertos', cima: 'abertos', caderno: 'abertos', aberta: 'sorriso', o: 'sorriso' } },
+    escrita: { label: 'Escrevendo', parts: PARTS_ESCRITA, slots: SLOTS_ESCRITA, neck: [470, 830], ground: [515, 1452], shadow: 340, scale: 0.86,
+               write: true,
+               fallback: { felizes: 'fechados', brilhantes: 'abertos', cima: 'abertos', caderno: 'abertos', aberta: 'sorriso', o: 'sorriso' } },
   };
 
   const ease = {
@@ -315,7 +317,7 @@
       c.setTransform(k, 0, 0, k, 0, 0);
       const sh = 1 - Math.min(s.pulo, 80) / 200;
       c.fillStyle = 'rgba(84,62,102,0.16)';
-      c.beginPath(); c.ellipse(GROUND[0], GROUND[1], P.shadow * sh, 34 * sh, 0, 0, Math.PI * 2); c.fill();
+      c.beginPath(); c.ellipse(GROUND[0], GROUND[1], P.shadow * sh * (P.scale || 1), 34 * sh, 0, 0, Math.PI * 2); c.fill();
 
       // transformação do corpo (respiração, pulo, amassar)
       const sy = 1 + s.respira * 0.008 - s.amassa;
@@ -323,7 +325,8 @@
       const rootM = new DOMMatrix().translate(GROUND[0], GROUND[1] - s.pulo).scale(sx, sy).translate(-GROUND[0], -GROUND[1]);
       const hs = P.headScale || 1;
       const headM = rootM.translate(NECK[0], NECK[1] + s.cabecaY * hs).rotate(s.cabeca * hs).translate(-NECK[0], -NECK[1]);
-      const base = new DOMMatrix().scale(k, k);
+      const ps = P.scale || 1;   // tamanho da pose dentro do quadro
+      const base = new DOMMatrix().scale(k, k).translate(GROUND[0], GROUND[1]).scale(ps).translate(-GROUND[0], -GROUND[1]);
 
       for (const p of P.parts) {
         const g = base.multiply(p.group === 'head' ? headM : rootM);

@@ -61,6 +61,7 @@ em pixels de uma tela de 1024 × 1536.
 Cada pose fica em `POSES` no `fantoche.js`, com sua lista de peças, expressões, pivô da cabeça (`neck`) e chão (`ground`).
 O `fallback` diz qual expressão usar quando a pose não tem a pedida (ex.: na escrita não há olhos "meio fechados", então a piscada usa os fechados).
 
-As peças da escrita começam com `e-` em `assets/pecas/` e foram recortadas do próprio desenho original da pose:
-a base parada (corpo, caderno e pata do caderno), a cabeça, o rabo e a mão com o lápis. Os olhos fechados são uma
-"pálpebra" pintada com o pelo da testa e o risquinho de olho fechado do kit v3.
+As peças da escrita começam com `e-` em `assets/pecas/` e vieram do "Escrita_Kit_v4": separadas do próprio desenho
+original da pose, sem redesenho, com as partes escondidas reconstruídas por baixo (pescoço sob a cabeça, peito sob o braço,
+base do rabo e raízes das orelhas). Os olhos meio fechados são do kit v4; os fechados são uma pálpebra pintada com o pelo
+da testa mais o risquinho de olho fechado do kit v3.

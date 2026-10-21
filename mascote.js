@@ -35,7 +35,7 @@
         tail: { base: [830, 1390], tip: [905, 985], r: 120, kind: 'chain' },
       },
       eyes: null,
-      idle: { breath: 1.7, breathRate: 0.16, tail: 4, head: 1.2, blink: false },
+      idle: { breath: 1.4, breathRate: 0.16, tail: 2.5, head: 0.8, blink: false },
       enter: 'suspirar',
     },
     clareza: {
@@ -46,7 +46,7 @@
         tail: { base: [830, 1390], tip: [905, 985], r: 120, kind: 'chain' },
       },
       eyes: [[376, 477, 57, 51, 3], [618, 490, 58, 51, 3]],
-      idle: { breath: 1, breathRate: 0.25, tail: 6, head: 1.5, blink: true },
+      idle: { breath: 0.7, breathRate: 0.25, tail: 3.5, head: 0.9, blink: true },
       enter: 'atenta',
     },
     permissao: {
@@ -57,7 +57,7 @@
         tail: { base: [855, 1400], tip: [900, 1020], r: 115, kind: 'chain' },
       },
       eyes: [[432, 445, 54, 56, 20], [659, 540, 59, 51, 20]],
-      idle: { breath: 1, breathRate: 0.22, tail: 5, head: 3, blink: true },
+      idle: { breath: 0.7, breathRate: 0.22, tail: 3, head: 1.5, blink: true },
       enter: 'inclinar',
     },
     'menor-passo': {
@@ -68,7 +68,7 @@
         tail: { base: [800, 930], tip: [905, 480], r: 120, kind: 'chain' },
       },
       eyes: [[291, 577, 53, 54, 11], [520, 623, 61, 53, 11]],
-      idle: { breath: 0.8, breathRate: 0.3, tail: 9, head: 1.5, blink: true, bob: 1 },
+      idle: { breath: 0.6, breathRate: 0.3, tail: 5, head: 0.9, blink: true, bob: 0.5 },
       enter: 'passinho',
     },
     comemoracao: {
@@ -81,7 +81,7 @@
         armR: { base: [715, 750], tip: [830, 455], r: 105, kind: 'chain' },
       },
       eyes: null,
-      idle: { breath: 1, breathRate: 0.35, tail: 10, head: 2, blink: false, arms: 4 },
+      idle: { breath: 0.7, breathRate: 0.35, tail: 5, head: 1, blink: false, arms: 2.5 },
       enter: 'festa',
     },
     descanso: {
@@ -91,19 +91,19 @@
         head: { base: [470, 1010], tip: [440, 640], r: 300, kind: 'rigid' },
       },
       eyes: null,
-      idle: { breath: 2.2, breathRate: 0.14, tail: 0, head: 0.8, blink: false },
+      idle: { breath: 1.8, breathRate: 0.14, tail: 0, head: 0.5, blink: false },
       enter: null,
     },
     escrita: {
       label: 'Escrita',
-      ground: [560, 1405, 300],
+      ground: [510, 1447, 330],
       bones: {
-        head: { base: [505, 770], tip: [520, 330], r: 400, kind: 'rigid' },
-        tail: { base: [810, 1270], tip: [872, 945], r: 110, kind: 'chain' },
+        head: { base: [500, 770], tip: [480, 300], r: 400, kind: 'rigid' },
+        tail: { base: [865, 1360], tip: [900, 990], r: 110, kind: 'chain' },
       },
-      eyes: [[415, 590, 61, 51, 16], [636, 655, 65, 45, 16]],
-      wiggle: [[385, 845, 95]],
-      idle: { breath: 0.9, breathRate: 0.22, tail: 5, head: 1.2, blink: true, write: 1 },
+      eyes: [[394, 569, 67, 57, 8], [645, 641, 70, 47, 16]],
+      wiggle: [[368, 880, 85]],
+      idle: { breath: 0.6, breathRate: 0.22, tail: 3, head: 0.8, blink: true, write: 1 },
       enter: 'escrever',
     },
   };
@@ -136,7 +136,7 @@
       if (t > d) return false;
       const x = t / d;
       const inhale = x < 0.45 ? ease.inOut(x / 0.45) : 1 - ease.inOut((x - 0.45) / 0.55);
-      p.breath += inhale * 4.5;
+      p.breath += inhale * 3.5;
       p.head += -inhale * 3;
       p.jump += -inhale * 4;
       p.lid = Math.max(p.lid, x > 0.4 && x < 0.9 ? 0.5 * ease.bump((x - 0.4) / 0.5) : 0);
@@ -152,13 +152,13 @@
     inclinar(t, p) {
       const d = 1.6;
       if (t > d) return false;
-      p.head += ease.bump(t / d) * 7;
+      p.head += ease.bump(t / d) * 4.5;
     },
     curiosa(t, p) { // inclina pra um lado e pro outro
       const d = 2.0;
       if (t > d) return false;
       const x = t / d;
-      p.head += Math.sin(x * Math.PI * 2) * 7 * ease.bump(x);
+      p.head += Math.sin(x * Math.PI * 2) * 4.5 * ease.bump(x);
     },
     acenar(t, p) { // sim com a cabeça
       const d = 1.0;
@@ -171,7 +171,7 @@
       const x = t / d;
       p.shiftX += ease.inOut(Math.min(x * 1.6, 1)) * 14 - (x > 0.62 ? ease.inOut((x - 0.62) / 0.38) * 14 : 0);
       p.jump += Math.abs(Math.sin(x * Math.PI * 3)) * 9;
-      p.sway += Math.sin(x * Math.PI * 3) * 1.5;
+      
     },
     pular(t, p) {
       const d = 0.75;
@@ -185,34 +185,34 @@
       const d = 1.6;
       if (t > d) return false;
       ACTIONS.pular(t % 0.8, p);
-      const w = Math.sin(t * 14) * 9 * ease.bump(t / d);
+      const w = Math.sin(t * 14) * 6 * ease.bump(t / d);
       p.armL += w; p.armR -= w;
-      p.tail += Math.sin(t * 12) * 10;
+      p.tail += Math.sin(t * 12) * 6;
     },
     tchau(t, p) { // acena com os braços (pose comemoração) ou com a cabeça
       const d = 1.8;
       if (t > d) return false;
-      const w = Math.sin(t * 12) * 10 * ease.bump(t / d);
+      const w = Math.sin(t * 12) * 7 * ease.bump(t / d);
       p.armR -= w; p.armL += w * 0.4;
       if (!p._hasArms) p.head += w * 0.35;
     },
     abanar(t, p) { // rabo animado
       const d = 1.6;
       if (t > d) return false;
-      p.tail += Math.sin(t * 16) * 16 * ease.bump(t / d);
+      p.tail += Math.sin(t * 16) * 10 * ease.bump(t / d);
     },
     escrever(t, p) {
       const d = 2.4;
       if (t > d) return false;
       const k = ease.bump(t / d);
-      p.wiggleX += Math.sin(t * 15) * 9 * k;
-      p.wiggleY += Math.abs(Math.cos(t * 7.5)) * 6 * k;
+      p.wiggleX += Math.sin(t * 15) * 6 * k;
+      p.wiggleY += Math.abs(Math.cos(t * 7.5)) * 4 * k;
       p.nod += Math.sin(t * 7.5) * 1.5 * k;
     },
     tremer(t, p) { // "brrr" de frio/susto
       const d = 0.6;
       if (t > d) return false;
-      p.sway += Math.sin(t * 60) * 1.6 * (1 - t / d);
+      p.sway += Math.sin(t * 60) * 1 * (1 - t / d);
     },
   };
 
@@ -490,7 +490,7 @@
       if (id.arms) { p.armL += Math.sin(time * 2.4) * id.arms; p.armR -= Math.sin(time * 2.4 + 0.6) * id.arms; }
       if (id.write) {
         const on = (Math.sin(time * 0.9) > -0.2) ? 1 : 0;
-        p.wiggleX += Math.sin(time * 13) * 5 * on * id.write;
+        p.wiggleX += Math.sin(time * 13) * 3.5 * on * id.write;
         p.wiggleY += Math.abs(Math.cos(time * 6.5)) * 3 * on * id.write;
       }
       if (includeActions) {
@@ -518,7 +518,7 @@
       }
       gl.uniform4fv(u.bone, bones); gl.uniform4fv(u.boneP, bp);
       const g = rig.ground;
-      gl.uniform4f(u.global, p.breath * 0.006, p.sway * D, p.jump + p.nod * 1.2, p.squash);
+      gl.uniform4f(u.global, p.breath * 0.0035, p.sway * D, p.jump + p.nod * 1.2, p.squash);
       gl.uniform4f(u.ground, g[0], g[1], p.shiftX, scale);
       if (rig.wiggle) { const w = rig.wiggle[0]; gl.uniform4f(u.wig, w[0], w[1], w[2], 0); }
       else gl.uniform4f(u.wig, 0, 0, 0, 0);

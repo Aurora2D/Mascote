@@ -1,6 +1,11 @@
 # Gatinha — mascote do app da Erica
 
-Abra o **index.html** (duplo clique já funciona) para ver a gatinha e testar as poses e ações.
+Há duas versões para comparar:
+
+- **Malha** (`index.html`, na raiz): usa as 7 poses inteiras e deforma a imagem de leve. Tem todas as poses.
+- **Fantoche** (`fantoche/index.html`): monta a gata sentada com as peças separadas (corpo, cabeça, orelhas, rabo, patas, olhos, boca). As peças só giram, se movem e trocam, sem deformar nada. Por enquanto tem só a pose sentada, mas troca de verdade as expressões (olhos felizes, boca aberta, bochechas, pata levantada).
+
+Duplo clique em qualquer um dos dois já funciona.
 
 ## Arquivos
 - `mascote.js`: o motor da animação e o **RIG** (configuração de cada pose). É aqui que se mexe.
@@ -50,3 +55,19 @@ Parâmetros disponíveis: `head`, `tail`, `armL`, `armR` (graus), `breath`, `swa
 2. Salve em `assets/poses/nome.webp` (e, se quiser, embuta no `mascote-assets.js`).
 3. Crie um bloco no `RIG` dentro do `mascote.js` com os pontos em pixels da imagem:
    pescoço e topo da cabeça (`head`), base e ponta do rabo (`tail`), olhos (`eyes`) e centro do chão (`ground`).
+
+## Versão fantoche
+```html
+<script src="fantoche/fantoche-assets.js"></script>
+<script src="fantoche/fantoche.js"></script>
+<gatinha-fantoche id="cat" style="width:300px"></gatinha-fantoche>
+<script>
+  cat.play('tchau');                                // ações
+  cat.setFace({ olhos: 'brilhantes', boca: 'o' });  // expressão de repouso
+</script>
+```
+**Ações:** `piscar`, `feliz`, `curiosa`, `brilho`, `suspirar`, `tchau`, `vergonha`, `sim`, `nao`, `abanar`, `orelhas`, `pular`
+
+**Olhos:** `abertos`, `meio`, `fechados`, `felizes`, `brilhantes`, `cima` · **Boca:** `sorriso`, `aberta`, `o`
+
+A posição de cada peça fica na lista `PARTS` do `fantoche.js` (centro, largura e ponto de giro).

@@ -27,7 +27,7 @@
     { id: 'orelhaDir',  img: 'orelha-dir',     cx: 688, cy: 322,  w: 265, pivot: [625, 445],  rot: 7, group: 'head' },
     { id: 'corpo',      img: 'corpo',          cx: 510, cy: 1075, w: 730, group: 'root' },
     { id: 'patasTras',  img: 'patas-tras',     cx: 505, cy: 1345, w: 470, group: 'root' },
-    { id: 'pataEsq',    img: 'pata-esq',       cx: 410, cy: 1062, w: 300, pivot: [410, 700],  rot: 3.4, group: 'root' },
+    { id: 'pataEsq',    img: 'pata-esq',       cx: 450, cy: 1062, w: 300, pivot: [450, 700],  rot: 6.4, group: 'root' },
     { id: 'pataDir',    img: 'pata-dir',       cx: 610, cy: 1058, w: 245, pivot: [610, 700],  rot: -3.4, group: 'root' },
     { id: 'pataLevantada', img: 'pata-levantada', cx: 705, cy: 800, w: 350, pivot: [615, 985], group: 'root' },
     { id: 'cabeca',     img: 'cabeca',         cx: 505, cy: 478,  w: 615, group: 'head' },

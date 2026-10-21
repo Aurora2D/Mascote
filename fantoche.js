@@ -78,7 +78,7 @@
   const POSES = {
     sentada: { label: 'Sentada', parts: PARTS, slots: SLOTS, neck: [505, 716], ground: [510, 1455], shadow: 330,
                fallback: {} },
-    escrita: { label: 'Escrevendo', parts: PARTS_ESCRITA, slots: SLOTS_ESCRITA, neck: [470, 830], ground: [515, 1452], shadow: 340, scale: 0.86, earScale: 0.45,
+    escrita: { label: 'Escrevendo', parts: PARTS_ESCRITA, slots: SLOTS_ESCRITA, neck: [470, 830], ground: [515, 1452], shadow: 340, scale: 0.86, earScale: 0.45, tailRange: [-8, 0],
                write: true,
                fallback: { felizes: 'fechados', brilhantes: 'abertos', cima: 'abertos', caderno: 'abertos', aberta: 'sorriso', o: 'sorriso' } },
   };
@@ -332,7 +332,12 @@
         const g = base.multiply(p.group === 'head' ? headM : rootM);
         let m = g;
         let ang = p.rot || 0, alpha = 1;
-        if (p.id === 'rabo') ang += s.rabo;
+        if (p.id === 'rabo') {
+          if (P.tailRange) { // balança só dentro de uma faixa (ex.: só pra dentro, sem abrir fresta)
+            const [lo, hi] = P.tailRange, t01 = Math.min(1, Math.max(0, (s.rabo + 8) / 16));
+            ang += lo + (hi - lo) * t01;
+          } else ang += s.rabo;
+        }
         if (p.id === 'orelhaEsq') ang += s.orelhaEsq * (P.earScale || 1);
         if (p.id === 'orelhaDir') ang += s.orelhaDir * (P.earScale || 1);
         if (p.id === 'pataLevantada') { ang += s.pata + (1 - s.pataLevantada) * 35; alpha = s.pataLevantada; }

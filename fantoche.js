@@ -27,13 +27,13 @@
     { id: 'orelhaDir',  img: 'orelha-dir',     cx: 688, cy: 322,  w: 265, pivot: [625, 445],  rot: 7, group: 'head' },
     { id: 'corpo',      img: 'corpo',          cx: 510, cy: 1075, w: 730, group: 'root' },
     { id: 'patasTras',  img: 'patas-tras',     cx: 505, cy: 1335, w: 517, group: 'root' },
-    { id: 'pataEsq',    img: 'pata-esq',       cx: 395, cy: 1057, w: 300, pivot: [395, 1057], rot: 8.7, group: 'root' },  // espelho da pata branca
+    { id: 'pataEsq',    img: 'pata-esq',       cx: 390, cy: 1057, w: 300, pivot: [390, 1057], rot: 8.7, group: 'root' },  // espelho da pata branca
     { id: 'pataDir',    img: 'pata-dir',       cx: 610, cy: 1058, w: 245, pivot: [610, 700],  rot: -3.4, group: 'root' },
     { id: 'cabeca',     img: 'cabeca',         cx: 505, cy: 478,  w: 615, group: 'head' },
     { id: 'bochechas',  img: 'bochechas',      cx: 506, cy: 562,  w: 415, group: 'head' },
     { id: 'olhos',      slot: 'olhos', group: 'head' },
     { id: 'boca',       slot: 'boca',  group: 'head' },
-    { id: 'pataLevantada', img: 'pata-levantada', cx: 705, cy: 760, w: 350, pivot: [615, 945], group: 'root' },  // na frente da cabeça
+    { id: 'pataLevantada', img: 'pata-levantada', cx: 705, cy: 750, w: 350, pivot: [615, 935], group: 'root' },  // na frente da cabeça
   ];
 
   /* Variações de olhos e boca (já calibradas pra caber no mesmo lugar) */

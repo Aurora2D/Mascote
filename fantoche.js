@@ -29,11 +29,11 @@
     { id: 'patasTras',  img: 'patas-tras',     cx: 505, cy: 1345, w: 470, group: 'root' },
     { id: 'pataEsq',    img: 'pata-esq',       cx: 395, cy: 1057, w: 300, pivot: [395, 1057], rot: 8.7, group: 'root' },  // espelho da pata branca
     { id: 'pataDir',    img: 'pata-dir',       cx: 610, cy: 1058, w: 245, pivot: [610, 700],  rot: -3.4, group: 'root' },
-    { id: 'pataLevantada', img: 'pata-levantada', cx: 705, cy: 800, w: 350, pivot: [615, 985], group: 'root' },
     { id: 'cabeca',     img: 'cabeca',         cx: 505, cy: 478,  w: 615, group: 'head' },
     { id: 'bochechas',  img: 'bochechas',      cx: 506, cy: 562,  w: 415, group: 'head' },
     { id: 'olhos',      slot: 'olhos', group: 'head' },
     { id: 'boca',       slot: 'boca',  group: 'head' },
+    { id: 'pataLevantada', img: 'pata-levantada', cx: 705, cy: 760, w: 350, pivot: [615, 945], group: 'root' },  // na frente da cabeça
   ];
 
   /* Variações de olhos e boca (já calibradas pra caber no mesmo lugar) */
@@ -103,7 +103,7 @@
       const d = 2.2; if (t > d) return false;
       const up = clamp01(t / 0.25) * clamp01((d - t) / 0.25);
       s.pataLevantada = Math.max(s.pataLevantada, up);
-      s.pata += Math.sin(t * 11) * 12 * up;
+      s.pata += (4 + Math.sin(t * 11) * 10) * up;  // balança mais pra fora que pra dentro, sem tapar o olho
       s.cabeca += -3 * up; s.boca = 'aberta';
     },
     vergonha(t, s) {

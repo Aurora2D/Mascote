@@ -15,6 +15,9 @@
   'use strict';
 
   const W = 1024, H = 1536;
+  /* Folga dos lados (px da tela de montagem): o desenho pode passar da caixa do elemento,
+   * pra ponta do rabo não ser cortada quando balança. Não muda tamanho nem lugar da gatinha. */
+  const FOLGA = 160;
 
   /* ---------- MONTAGEM: onde cada peça fica (centro, largura) e onde gira (pivot) ----------
    * Proporções medidas no desenho original da gatinha.
@@ -80,7 +83,7 @@
   /* Cada pose: peças, expressões, pivô da cabeça (neck), chão (ground) e
    * "fallback" = qual expressão usar quando a pose não tem a pedida. */
   const POSES = {
-    sentada: { label: 'Sentada', parts: PARTS, slots: SLOTS, neck: [505, 716], ground: [510, 1455], shadow: 330, tailMax: 0.5,
+    sentada: { label: 'Sentada', parts: PARTS, slots: SLOTS, neck: [505, 716], ground: [510, 1455], shadow: 330,
                fallback: {} },
     escrita: { label: 'Escrevendo', parts: PARTS_ESCRITA, slots: SLOTS_ESCRITA, neck: [470, 830], ground: [515, 1452], shadow: 340, scale: 0.86, earScale: 0.45, tailRange: [-8, 0],
                write: true,
@@ -189,7 +192,7 @@
     constructor() {
       super();
       const root = this.attachShadow({ mode: 'open' });
-      root.innerHTML = `<style>:host{display:block;aspect-ratio:2/3}canvas{width:100%;height:100%;display:block}</style><canvas></canvas>`;
+      root.innerHTML = `<style>:host{display:block;aspect-ratio:2/3;position:relative}canvas{position:absolute;top:0;left:${-FOLGA / W * 100}%;width:${(W + 2 * FOLGA) / W * 100}%;height:100%;display:block;pointer-events:none}</style><canvas></canvas>`;
       this.canvas = root.querySelector('canvas');
       this.ctx = this.canvas.getContext('2d');
       this.imgs = {}; this.running = []; this.time = 0; this.nextBlink = 1.2; this.nextEar = 4;
@@ -220,7 +223,7 @@
 
     _resize() {
       const dpr = Math.min(window.devicePixelRatio || 1, 2.5);
-      this.canvas.width = Math.max(1, Math.round(this.clientWidth * dpr));
+      this.canvas.width = Math.max(1, Math.round(this.clientWidth * (W + 2 * FOLGA) / W * dpr));
       this.canvas.height = Math.max(1, Math.round(this.clientHeight * dpr));
       for (const b of this.buf) { b.width = this.canvas.width; b.height = this.canvas.height; }
     }
@@ -310,7 +313,7 @@
     }
 
     _drawPose(c, P, s, clear) {
-      const k = this.canvas.width / W;
+      const k = this.canvas.height / H, fx = FOLGA * k;
       const NECK = P.neck, GROUND = P.ground;
       c.setTransform(1, 0, 0, 1, 0, 0);
       if (clear) c.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -318,7 +321,7 @@
       this._ctx = c;
 
       // sombra
-      c.setTransform(k, 0, 0, k, 0, 0);
+      c.setTransform(k, 0, 0, k, fx, 0);
       const sh = 1 - Math.min(s.pulo, 80) / 200;
       c.fillStyle = 'rgba(84,62,102,0.16)';
       c.beginPath(); c.ellipse(GROUND[0], GROUND[1], P.shadow * sh * (P.scale || 1), 34 * sh, 0, 0, Math.PI * 2); c.fill();
@@ -330,7 +333,7 @@
       const hs = P.headScale || 1;
       const headM = rootM.translate(NECK[0], NECK[1] + s.cabecaY * hs).rotate(s.cabeca * hs).translate(-NECK[0], -NECK[1]);
       const ps = P.scale || 1;   // tamanho da pose dentro do quadro
-      const base = new DOMMatrix().scale(k, k).translate(GROUND[0], GROUND[1]).scale(ps).translate(-GROUND[0], -GROUND[1]);
+      const base = new DOMMatrix().translate(fx, 0).scale(k, k).translate(GROUND[0], GROUND[1]).scale(ps).translate(-GROUND[0], -GROUND[1]);
 
       for (const p of P.parts) {
         const g = base.multiply(p.group === 'head' ? headM : rootM);
@@ -340,8 +343,6 @@
           if (P.tailRange) { // balança só dentro de uma faixa (ex.: só pra dentro, sem abrir fresta)
             const [lo, hi] = P.tailRange, t01 = Math.min(1, Math.max(0, (s.rabo + 8) / 16));
             ang += lo + (hi - lo) * t01;
-          } else if (P.tailMax != null && s.rabo > 0) { // pra fora, freia suave antes da borda do quadro
-            ang += P.tailMax * Math.tanh(s.rabo / P.tailMax);
           } else ang += s.rabo;
         }
         if (p.id === 'orelhaEsq') ang += s.orelhaEsq * (P.earScale || 1);

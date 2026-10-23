@@ -34,12 +34,13 @@ open('fantoche-assets.js', 'w').write(js)
 ## Como o motor funciona (`fantoche.js`)
 
 - **Tela de montagem:** 1024 × 1536 px. Todas as coordenadas do código estão nessa escala, e o canvas escala para o tamanho real.
+- **Folga (`FOLGA`, 160 px de cada lado):** o canvas é mais largo que a caixa do elemento e vaza pros lados, sem mudar tamanho nem lugar da gatinha nem empurrar o layout. Existe porque, na pose sentada, a ponta do rabo passa até ~130 px da borda direita no `abanar`. Se um movimento novo for mais longe que isso, aumente a folga em vez de limitar o movimento. Se o elemento estiver dentro de algo com `overflow: hidden`, o corte volta.
 - **`POSES`:** uma entrada por pose (`sentada`, `escrita`), cada uma com:
   - `parts`: lista de peças, desenhadas na ordem do array (de trás pra frente). Cada peça tem `img`, centro `cx`/`cy`, largura `w`, ponto de giro `pivot`, inclinação fixa `rot` e `group` (`'root'` acompanha o corpo, `'head'` acompanha a cabeça).
   - `slots`: variações trocáveis de `olhos` e `boca`. `img: null` significa "não desenha nada", porque a expressão já está pintada na cabeça.
   - `neck` (pivô da cabeça), `ground` (chão: pivô da respiração e centro da sombra) e `shadow` (largura da sombra).
   - `fallback`: qual expressão usar quando a pose não tem a pedida. Exemplo: na escrita, `felizes` vira `fechados`.
-  - Opcionais: `scale` (tamanho da pose no quadro), `earScale` (reduz a mexida das orelhas), `tailRange: [min, max]` (faixa em graus em que o rabo balança), `tailMax` (quantos graus o rabo pode ir pra fora, com freio suave; na sentada é 0,5 porque mais que isso a ponta sai do quadro) e `write: true` (escrita automática).
+  - Opcionais: `scale` (tamanho da pose no quadro), `earScale` (reduz a mexida das orelhas), `tailRange: [min, max]` (faixa em graus em que o rabo balança) e `write: true` (escrita automática).
 - **`ACTIONS`:** cada ação é `função(t, s)`. `t` são os segundos desde o início e `s` é o estado do quadro. A função soma valores ao estado e retorna `false` quando termina. Estado disponível: `cabeca`, `orelhaEsq`, `orelhaDir`, `rabo`, `pata` (graus), `cabecaY`, `pulo`, `escritaX`, `escritaY` (px), `respira`, `amassa`, `olhos`, `boca`, `bochechas` (0 a 1), `pataLevantada` (0 a 1) e `escrevendo`.
 - **Movimentos automáticos:** respirar, cabeça, rabo, piscar e mexer orelha ficam em `_state()` e `_frame()`.
 - **Troca de pose:** cada pose é desenhada num buffer e as duas são misturadas por uns 0,45 s.
@@ -49,7 +50,7 @@ open('fantoche-assets.js', 'w').write(js)
 
 1. **Nunca use peças redesenhadas por IA em partes visíveis.** As ferramentas de imagem redesenham mesmo quando o pedido é "só apague": a cabeça volta mais redonda, com olhos menores e outra boca, e a gata fica "deformada". O que funciona é usar os **pixels exatos do desenho original** em tudo o que aparece, e o conteúdo reconstruído **só nas áreas escondidas**, que aparecem quando uma peça se mexe. Foi isso que resolveu a pose escrita (kit v4).
 2. **Confira sempre a montagem parada contra o desenho original**, pixel a pixel (diferença perto de zero) e visualmente com zoom. Linhas finas e "aspecto de recorte" aparecem justamente nas emendas.
-3. **Teste os extremos do movimento.** Se uma peça abre fresta ou mostra corte ao se mexer, reduza a amplitude naquela pose (`earScale`, `tailRange`), em vez de deixar o defeito. Exemplo: na escrita, o rabo só pode balançar pra dentro, porque pra fora ele se afasta do corpo. Na sentada, a ponta do rabo sai do quadro se for pra fora, por isso `tailMax: 0.5`.
+3. **Teste os extremos do movimento.** Se uma peça abre fresta ou mostra corte ao se mexer, reduza a amplitude naquela pose (`earScale`, `tailRange`), em vez de deixar o defeito. Exemplo: na escrita, o rabo só pode balançar pra dentro, porque pra fora ele se afasta do corpo.
 4. **Kits vindos da ferramenta de imagem** costumam trazer: tela inteira 1024 × 1536 (bom, já encaixado), mas às vezes **blocos de fundo branco opaco** e borda sem suavização. Limpe usando o canal alfa do desenho original (`alfa = min(alfa_da_peça, alfa_do_original)`) e suavize a borda em menos de 1 px.
 5. **Cada pose tem o próprio desenho de referência.** As peças da pose sentada vieram de gerações separadas e foram encaixadas à mão pelas proporções do desenho original. Os ajustes finos foram pedidos pelo Thiago peça por peça: orelhas inclinadas, patas dianteiras espelhadas, rabo atrás do corpo, mãozinha do tchau na frente da cabeça. Não "corrija" esses valores sem pedir.
 6. As medidas que o Thiago pede em "pixels" são pixels da **tela de montagem (1024 de largura)**, não da tela do celular.

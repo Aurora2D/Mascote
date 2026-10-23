@@ -57,7 +57,7 @@ Estado disponível: `cabeca`, `orelhaEsq`, `orelhaDir`, `rabo`, `pata` (graus), 
 Cada peça em `PARTS` tem centro (`cx`, `cy`), largura (`w`), ponto de giro (`pivot`) e inclinação fixa (`rot`),
 em pixels de uma tela de 1024 × 1536.
 
-Na pose sentada, o rabo balança quase só pra dentro (`tailMax` em `POSES`), porque pra fora a ponta sai do quadro.
+O desenho tem uma folga invisível dos lados (`FOLGA` no `fantoche.js`): o rabo pode passar da caixa do elemento quando balança, sem ser cortado. Só não coloque a gatinha dentro de algo com `overflow: hidden` se quiser o rabo inteiro.
 
 ## Poses
 Cada pose fica em `POSES` no `fantoche.js`, com sua lista de peças, expressões, pivô da cabeça (`neck`) e chão (`ground`).

@@ -57,6 +57,8 @@ Estado disponível: `cabeca`, `orelhaEsq`, `orelhaDir`, `rabo`, `pata` (graus), 
 Cada peça em `PARTS` tem centro (`cx`, `cy`), largura (`w`), ponto de giro (`pivot`) e inclinação fixa (`rot`),
 em pixels de uma tela de 1024 × 1536.
 
+Na pose sentada, o rabo balança quase só pra dentro (`tailMax` em `POSES`), porque pra fora a ponta sai do quadro.
+
 ## Poses
 Cada pose fica em `POSES` no `fantoche.js`, com sua lista de peças, expressões, pivô da cabeça (`neck`) e chão (`ground`).
 O `fallback` diz qual expressão usar quando a pose não tem a pedida (ex.: na escrita não há olhos "meio fechados", então a piscada usa os fechados).

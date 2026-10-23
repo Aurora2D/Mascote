@@ -80,7 +80,7 @@
   /* Cada pose: peças, expressões, pivô da cabeça (neck), chão (ground) e
    * "fallback" = qual expressão usar quando a pose não tem a pedida. */
   const POSES = {
-    sentada: { label: 'Sentada', parts: PARTS, slots: SLOTS, neck: [505, 716], ground: [510, 1455], shadow: 330,
+    sentada: { label: 'Sentada', parts: PARTS, slots: SLOTS, neck: [505, 716], ground: [510, 1455], shadow: 330, tailMax: 0.5,
                fallback: {} },
     escrita: { label: 'Escrevendo', parts: PARTS_ESCRITA, slots: SLOTS_ESCRITA, neck: [470, 830], ground: [515, 1452], shadow: 340, scale: 0.86, earScale: 0.45, tailRange: [-8, 0],
                write: true,
@@ -340,6 +340,8 @@
           if (P.tailRange) { // balança só dentro de uma faixa (ex.: só pra dentro, sem abrir fresta)
             const [lo, hi] = P.tailRange, t01 = Math.min(1, Math.max(0, (s.rabo + 8) / 16));
             ang += lo + (hi - lo) * t01;
+          } else if (P.tailMax != null && s.rabo > 0) { // pra fora, freia suave antes da borda do quadro
+            ang += P.tailMax * Math.tanh(s.rabo / P.tailMax);
           } else ang += s.rabo;
         }
         if (p.id === 'orelhaEsq') ang += s.orelhaEsq * (P.earScale || 1);

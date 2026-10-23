@@ -42,8 +42,12 @@
       meio:       { img: 'olhos-meio',       cx: 507, cy: 490, w: 464 },
       fechados:   { img: 'olhos-fechados',   cx: 508, cy: 493, w: 380 },
       felizes:    { img: 'olhos-felizes',    cx: 508, cy: 485, w: 412 },
-      brilhantes: { img: 'olhos-brilhantes', cx: 508, cy: 485, w: 449 },
-      cima:       { img: 'olhos-cima',       cx: 508, cy: 485, w: 405 },
+      /* 'brilhantes' e 'cima' usam os olhos originais: as peças olhos-brilhantes e olhos-cima vieram
+         redesenhadas (sem cílios, contorno mais grosso, outro tamanho) e destoavam no meio das ações.
+         As imagens continuam em assets/pecas; se forem refeitas a partir dos pixels originais
+         (só com a íris/pupila mexida), é só voltar a apontar pra elas aqui. */
+      brilhantes: { img: 'olhos-abertos',    cx: 508, cy: 485, w: 462 },
+      cima:       { img: 'olhos-abertos',    cx: 508, cy: 485, w: 462 },
     },
     boca: {
       sorriso: { img: 'boca-sorriso', cx: 505, cy: 606, w: 170 },

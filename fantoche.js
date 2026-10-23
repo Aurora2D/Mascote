@@ -80,6 +80,15 @@
     boca: { sorriso: { img: null } },
   };
 
+  /* ---------- POSES PERMISSÃO E COMEMORAÇÃO ----------
+   * Só o corpo é novo (desenho da pose, sem cabeça e sem rabo, com o pescoço da sentada por baixo).
+   * Cabeça, orelhas, expressões e rabo são os da sentada, então todas as caras funcionam igual. */
+  const comCorpo = (corpo) => PARTS
+    .filter((p) => !['corpo', 'patasTras', 'pataEsq', 'pataDir', 'pataLevantada'].includes(p.id))
+    .flatMap((p) => (p.id === 'orelhaDir' ? [p, corpo] : [p]));
+  const PARTS_PERMISSAO = comCorpo({ id: 'corpo', img: 'p-corpo', cx: 510.5, cy: 1034, w: 733, group: 'root' });
+  const PARTS_COMEMORACAO = comCorpo({ id: 'corpo', img: 'c-corpo', cx: 516, cy: 933.5, w: 980, group: 'root' });
+
   /* Cada pose: peças, expressões, pivô da cabeça (neck), chão (ground) e
    * "fallback" = qual expressão usar quando a pose não tem a pedida. */
   const POSES = {
@@ -88,6 +97,11 @@
     escrita: { label: 'Escrevendo', parts: PARTS_ESCRITA, slots: SLOTS_ESCRITA, neck: [470, 830], ground: [515, 1452], shadow: 340, scale: 0.86, earScale: 0.45, tailRange: [-8, 0],
                write: true,
                fallback: { felizes: 'fechados', brilhantes: 'abertos', cima: 'abertos', caderno: 'abertos', aberta: 'sorriso', o: 'sorriso' } },
+    // patinhas no peito, logo abaixo do queixo: a cabeça mexe menos pra não descobrir a emenda
+    permissao: { label: 'Permissão', parts: PARTS_PERMISSAO, slots: SLOTS, neck: [505, 716], ground: [510, 1455], shadow: 330, headScale: 0.6,
+                 fallback: {} },
+    comemoracao: { label: 'Comemoração', parts: PARTS_COMEMORACAO, slots: SLOTS, neck: [505, 716], ground: [510, 1455], shadow: 330,
+                   fallback: {} },
   };
 
   const ease = {
@@ -155,6 +169,16 @@
       const k = ease.bump(t / 0.5);
       s.orelhaEsq += Math.sin(t * 40) * 9 * k;
     },
+    comemorar(t, s) { // pulinhos de alegria; fica melhor na pose 'comemoracao'
+      const d = 2.4; if (t > d) return false;
+      const k = clamp01(t / 0.2) * clamp01((d - t) / 0.35);
+      s.olhos = 'felizes'; s.boca = 'aberta';
+      s.bochechas = Math.max(s.bochechas, k);
+      s.pulo += Math.abs(Math.sin(t * 7.5)) * 24 * k;
+      s.cabeca += Math.sin(t * 7.5) * 3 * k;
+      s.rabo += Math.sin(t * 15) * 12 * k;
+      s.orelhaEsq += 5 * k; s.orelhaDir -= 5 * k;
+    },
     abanar(t, s) {
       const d = 1.6; if (t > d) return false;
       s.rabo += Math.sin(t * 15) * 16 * ease.bump(t / d);
@@ -182,7 +206,7 @@
     },
   };
 
-  const ALIASES = { blink: 'piscar', curious: 'curiosa', sigh: 'suspirar', wave: 'tchau', paw: 'tchau', happy: 'feliz', jump: 'pular', wag: 'abanar' };
+  const ALIASES = { blink: 'piscar', curious: 'curiosa', sigh: 'suspirar', wave: 'tchau', paw: 'tchau', happy: 'feliz', jump: 'pular', wag: 'abanar', celebrate: 'comemorar' };
 
   function loadImage(src) {
     return new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error(src)); i.src = src; });
@@ -197,7 +221,7 @@
       this.ctx = this.canvas.getContext('2d');
       this.imgs = {}; this.running = []; this.time = 0; this.nextBlink = 1.2; this.nextEar = 4;
       this.face = { olhos: 'abertos', boca: 'sorriso' };
-      this.poseName = this.getAttribute('pose') || 'sentada'; this.prevPose = null; this.fade = 1;
+      this.poseName = this.getAttribute('pose') || 'sentada'; if (!POSES[this.poseName]) this.poseName = 'sentada';  // pose que ainda não existe cai na sentada this.prevPose = null; this.fade = 1;
       this.buf = [document.createElement('canvas'), document.createElement('canvas')];
       this.basePath = this.getAttribute('src-base') || 'assets/pecas/';
       this.ready = this._init();

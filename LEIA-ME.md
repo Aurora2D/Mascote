@@ -26,12 +26,12 @@ A gata é montada como um fantoche: cada parte (corpo, cabeça, orelhas, rabo, p
 </script>
 ```
 
-**Poses:** `sentada`, `escrita` (troque com `cat.setPose('escrita')`)
+**Poses:** `sentada`, `escrita`, `permissao` (patinhas no peito), `comemoracao` (bracinhos pra cima) (troque com `cat.setPose('escrita')`). Pose que não existe vira `sentada`.
 
 Na pose escrita ela escreve sozinha uns 5 segundos olhando o caderno, para, olha pra frente e volta a escrever.
 
 **Ações:** `piscar`, `feliz`, `curiosa`, `brilho` (clareza), `suspirar`, `tchau`, `vergonha`, `sim`, `nao`,
-`abanar` (rabo), `orelhas`, `pular`, `escrever`
+`abanar` (rabo), `orelhas`, `pular`, `escrever`, `comemorar` (pulinhos de alegria; fica melhor na pose `comemoracao`)
 
 **Olhos:** `abertos`, `meio`, `fechados`, `felizes`, `brilhantes`, `cima`
 **Boca:** `sorriso`, `aberta`, `o`

@@ -86,7 +86,7 @@
   const dica = document.getElementById('dica');
 
   /* ---------- Miados (assets/sons, embutidos em miados.js) ----------
-     miadinho, miau, miaaau, mrrp (trilado de pergunta) e ronron.
+     miadinho, miau, miaaau, miu (pergunta) e ronron.
      Cada toque toca um pouco mais agudo ou mais grave, pra nunca soar igual. */
   let audio = null;
   const buffers = {};
@@ -112,7 +112,7 @@
       src.connect(audio.destination); src.start();
     } catch (e) { /* sem som, a gatinha reage do mesmo jeito */ }
   }
-  const SOM_DO_GESTO = { vergonha: 'ronron', suspirar: 'ronron', curiosa: 'miu', brilho: 'miu', sim: 'mrrp' };
+  const SOM_DO_GESTO = { vergonha: 'ronron', suspirar: 'ronron', curiosa: 'miu', brilho: 'miu' };
   const somPara = (gesto) => SOM_DO_GESTO[gesto] || sorteia(['miadinho', 'miau', 'miau', 'miaaau']);
 
   /* ---------- Reações: cada toque troca de pose e faz um gesto que combina ---------- */

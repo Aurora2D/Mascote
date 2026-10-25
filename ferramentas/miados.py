@@ -59,17 +59,6 @@ def ronron(dur=1.8):
     env = interp([(0, 0), (0.08, 1), (0.9, 1), (1, 0)], n)
     return base * pulsos * resp * env
 
-def trilado():
-    """'mrrp' de gato: boca quase fechada (m/u), rolamento suave que vai sumindo e o tom subindo no fim.
-    Versão 2: a primeira (rolamento forte até o 'i') soou estranha pra Erica."""
-    dur = 0.4; n = int(SR * dur); t = np.arange(n) / SR
-    v = voz(dur, [(0, 480), (0.55, 520), (1, 700)], [(0, 'm'), (0.4, 'u'), (0.85, 'u'), (1, 'e')],
-            [(0, 0), (0.12, 0.9), (0.7, 1), (1, 0)], vibrato=0.004, escala=1.4)
-    prof = np.clip(1 - t / (dur * 0.75), 0, 1) * 0.35          # rolamento leve que some
-    rol = 1 - prof * (0.5 + 0.5 * np.cos(2 * np.pi * 22 * t))
-    v = sosfilt(butter(2, 3500, 'lowpass', fs=SR, output='sos'), v * rol)   # mais abafado, de boca fechada
-    return v
-
 def miu():
     """'miu?' curtinho subindo no fim, como pergunta."""
     return voz(0.42, [(0, 620), (0.5, 700), (1, 980)], [(0, 'm'), (0.18, 'i'), (0.7, 'e'), (1, 'u')],
@@ -87,7 +76,6 @@ SONS = {
                 [(0, 0), (0.1, 1), (0.75, 0.8), (1, 0)], rouco=0.04),
     'miaaau': voz(1.0, [(0, 520), (0.3, 720), (0.7, 680), (1, 430)], [(0, 'm'), (0.1, 'i'), (0.35, 'a'), (0.75, 'a'), (1, 'u')],
                   [(0, 0), (0.08, 0.9), (0.4, 1), (0.85, 0.7), (1, 0)], vibrato=0.02, rouco=0.05),
-    'mrrp': trilado(),
     'miu': miu(),
     'ronron': ronron(),
 }

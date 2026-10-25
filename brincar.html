@@ -79,47 +79,41 @@
 
 <script src="fantoche-assets.js"></script>
 <script src="fantoche.js"></script>
+<script src="miados.js"></script>
 <script>
 (function () {
   const cat = document.getElementById('cat');
   const dica = document.getElementById('dica');
 
-  /* ---------- Miado feito na hora (sem arquivo de som) ----------
-     Uma onda com filtro que vai de "mi" pra "a" e fecha em "u": mi-a-u. */
+  /* ---------- Miados (assets/sons, embutidos em miados.js) ----------
+     miadinho, miau, miaaau, mrrp (trilado de pergunta) e ronron.
+     Cada toque toca um pouco mais agudo ou mais grave, pra nunca soar igual. */
   let audio = null;
-  function miau() {
+  const buffers = {};
+  function prepara() {
+    if (audio) return;
     try {
-      audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+      audio = new (window.AudioContext || window.webkitAudioContext)();
+      for (const [nome, url] of Object.entries(window.MIADOS || {})) {
+        const bin = atob(url.split(',')[1]); const bytes = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+        audio.decodeAudioData(bytes.buffer, (b) => { buffers[nome] = b; }, () => {});
+      }
+    } catch (e) { audio = null; }
+  }
+  function som(nome) {
+    try {
+      prepara(); if (!audio) return;
       if (audio.state === 'suspended') audio.resume();
-      const t = audio.currentTime;
-      const tipo = Math.random();
-      const dur = tipo < 0.3 ? 0.32 : tipo < 0.8 ? 0.6 : 0.85;   // miadinho, miau, miaaau
-      const base = 520 + Math.random() * 260;                     // cada miado num tom
-      const osc = audio.createOscillator(), osc2 = audio.createOscillator();
-      const filtro = audio.createBiquadFilter(), filtro2 = audio.createBiquadFilter();
-      const vol = audio.createGain();
-      osc.type = 'sawtooth'; osc2.type = 'triangle';
-      osc.frequency.setValueAtTime(base * 0.9, t);
-      osc.frequency.linearRampToValueAtTime(base * 1.35, t + dur * 0.35);
-      osc.frequency.linearRampToValueAtTime(base * 0.8, t + dur);
-      osc2.frequency.setValueAtTime(base * 1.8, t);
-      osc2.frequency.linearRampToValueAtTime(base * 2.7, t + dur * 0.35);
-      osc2.frequency.linearRampToValueAtTime(base * 1.6, t + dur);
-      filtro.type = 'bandpass'; filtro.Q.value = 4;
-      filtro.frequency.setValueAtTime(1300, t);
-      filtro.frequency.linearRampToValueAtTime(2600, t + dur * 0.4);
-      filtro.frequency.linearRampToValueAtTime(800, t + dur);
-      filtro2.type = 'lowpass'; filtro2.frequency.value = 4000;
-      vol.gain.setValueAtTime(0.0001, t);
-      vol.gain.exponentialRampToValueAtTime(0.55, t + 0.05);
-      vol.gain.setValueAtTime(0.55, t + dur * 0.6);
-      vol.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-      const g2 = audio.createGain(); g2.gain.value = 0.25;
-      osc.connect(filtro); osc2.connect(g2); g2.connect(filtro);
-      filtro.connect(filtro2); filtro2.connect(vol); vol.connect(audio.destination);
-      osc.start(t); osc2.start(t); osc.stop(t + dur + 0.05); osc2.stop(t + dur + 0.05);
+      const b = buffers[nome] || buffers.miau;
+      if (!b) { new Audio(window.MIADOS[nome]).play().catch(() => {}); return; }   // ainda decodificando
+      const src = audio.createBufferSource(); src.buffer = b;
+      src.playbackRate.value = nome === 'ronron' ? 1 : 0.9 + Math.random() * 0.22;
+      src.connect(audio.destination); src.start();
     } catch (e) { /* sem som, a gatinha reage do mesmo jeito */ }
   }
+  const SOM_DO_GESTO = { vergonha: 'ronron', suspirar: 'ronron', curiosa: 'mrrp', brilho: 'mrrp', sim: 'mrrp' };
+  const somPara = (gesto) => SOM_DO_GESTO[gesto] || sorteia(['miadinho', 'miau', 'miau', 'miaaau']);
 
   /* ---------- Reações: cada toque troca de pose e faz um gesto que combina ---------- */
   const REACOES = {
@@ -152,12 +146,12 @@
 
   function toque(ev) {
     ev.preventDefault();
-    miau();
+    prepara();
     coracoes(ev.clientX, ev.clientY);
     dica.classList.add('some');
 
     // se ainda está no meio de um gesto, só mia e mexe a orelha (não embola)
-    if (ocupada) { cat.play('orelhas'); return; }
+    if (ocupada) { som('miadinho'); cat.play('orelhas'); return; }
     ocupada = true;
 
     const atual = cat.poseName || 'sentada';
@@ -166,6 +160,7 @@
     let gesto = sorteia(REACOES[outra]);
     if (gesto === ultimoGesto) gesto = sorteia(REACOES[outra]);
     ultimoGesto = gesto;
+    som(somPara(gesto));
     setTimeout(() => {
       Promise.resolve(cat.play(gesto)).finally(() => { ocupada = false; });
     }, 250);

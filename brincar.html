@@ -112,7 +112,7 @@
       src.connect(audio.destination); src.start();
     } catch (e) { /* sem som, a gatinha reage do mesmo jeito */ }
   }
-  const SOM_DO_GESTO = { vergonha: 'ronron', suspirar: 'ronron', curiosa: 'mrrp', brilho: 'mrrp', sim: 'mrrp' };
+  const SOM_DO_GESTO = { vergonha: 'ronron', suspirar: 'ronron', curiosa: 'miu', brilho: 'miu', sim: 'mrrp' };
   const somPara = (gesto) => SOM_DO_GESTO[gesto] || sorteia(['miadinho', 'miau', 'miau', 'miaaau']);
 
   /* ---------- Reações: cada toque troca de pose e faz um gesto que combina ---------- */

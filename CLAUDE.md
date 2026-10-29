@@ -42,6 +42,7 @@ mostrando a imagem (ou tocando o som) antigo.
 - **Troca de pose:** cada pose é desenhada num buffer e as duas são misturadas por uns 0,45 s.
 - **Pose desconhecida:** se o atributo `pose` pedir uma pose que não existe, a gatinha usa a `sentada` (o app pode já pedir poses futuras sem quebrar).
 - **Rabo em malha:** sem `tailRange`, o rabo é desenhado por `_drawTailMesh()`, que corta a peça em 72 tiras e desloca cada uma numa curva em S (`amp` controla a amplitude). Com `tailRange` (escrita), volta a girar como peça rígida, porque a curva abria um vão branco entre o rabo e o corpo.
+- **Pescoço (`pescoco`):** peça escondida atrás do corpo da sentada que tapa a abertura entre a cabeça e o corpo. É o pelo do próprio `corpo` copiado pra cima (deslocado 40, 80 e 120 px), recortado pelo contorno da cabeça parada (esticado 14 px pra baixo, pra cobrir também a faixa clara sob as pontas do pelo do queixo) e limitado à largura do pescoço (|x − 505| < 190, sem os ombros, que viravam tufos roxos). Parada, só muda essa faixa clara do queixo; quando a cabeça sobe ou inclina, aparece pelo em vez de fundo.
 - **Atributo `pose`:** é observado (`attributeChangedCallback`). Não leia atributos no construtor: quando o elemento vem do HTML, eles ainda não existem ali.
 - **API:** `cat.setPose('escrita')`, `cat.play('tchau')` (retorna uma Promise), `cat.setFace({olhos, boca})`, `cat.addAction(nome, fn)`.
 

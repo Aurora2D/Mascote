@@ -27,6 +27,8 @@
     { id: 'rabo',       img: 'rabo',           cx: 838, cy: 1085, w: 235, pivot: [790, 1330], rot: 8, group: 'root' },
     { id: 'orelhaEsq',  img: 'orelha-esq',     cx: 322, cy: 318,  w: 255, pivot: [375, 450],  rot: -9, group: 'head' },
     { id: 'orelhaDir',  img: 'orelha-dir',     cx: 688, cy: 322,  w: 265, pivot: [625, 445],  rot: 7, group: 'head' },
+    // pelo do próprio corpo, escondido sob o queixo: tapa a abertura quando a cabeça sobe ou inclina
+    { id: 'pescoco',    img: 'pescoco',        cx: 505.5, cy: 678, w: 379, group: 'root' },
     { id: 'corpo',      img: 'corpo',          cx: 510, cy: 1075, w: 730, group: 'root' },
     { id: 'patasTras',  img: 'patas-tras',     cx: 505, cy: 1335, w: 517, group: 'root' },
     { id: 'pataEsq',    img: 'pata-esq',       cx: 390, cy: 1120, w: 260, pivot: [390, 1120], rot: 6.2, group: 'root' },  // perna mais curta, pé alinhado ao chão

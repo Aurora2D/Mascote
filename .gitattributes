@@ -1,2 +1,5 @@
 *.webp binary
-mascote-assets.js -diff linguist-generated
+*.png binary
+*.mp3 binary
+fantoche-assets.js -diff linguist-generated
+miados.js -diff linguist-generated

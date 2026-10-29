@@ -16,20 +16,16 @@ Converse em português do Brasil. O Thiago prefere ser guiado passo a passo em t
 | `fantoche.js` | O motor inteiro: montagem das peças, poses, expressões, ações e desenho no `<canvas>`. Sem bibliotecas. |
 | `fantoche-assets.js` | Todas as peças em base64 (`window.FANTOCHE_ASSETS`). Existe para a página funcionar aberta direto do disco, sem servidor. |
 | `assets/pecas/*.webp` | As mesmas peças soltas. As da pose escrita começam com `e-`. |
+| `brincar.html` | Página de brincar (a Niquinha): tela cheia, cada toque troca de pose, faz um gesto e mia. |
+| `miados.js` | Os miados em base64 (`window.MIADOS`), usados pela `brincar.html`. |
+| `assets/sons/*.mp3` | Os mesmos miados soltos: miadinho, miau, miaaau, miu e ronron. |
+| `ferramentas/miados.py` | Gera os miados por síntese (gera `.wav`; converta pra `.mp3`, veja o LEIA-ME). |
+| `ferramentas/embutir.py` | Regenera `fantoche-assets.js` e `miados.js` a partir das pastas de assets. |
 | `LEIA-ME.md` | Manual de uso para pessoas (API, ações, como criar ação nova). |
 
-**Sempre que trocar ou adicionar uma imagem em `assets/pecas/`, regenere a entrada correspondente em
-`fantoche-assets.js`.** Senão a página continua mostrando a imagem antiga. Exemplo em Python:
-
-```python
-import base64, re
-nome = 'e-cabeca'
-js = open('fantoche-assets.js').read()
-b64 = base64.b64encode(open(f'assets/pecas/{nome}.webp', 'rb').read()).decode()
-novo = f'"{nome}":"data:image/webp;base64,{b64}"'
-js = re.sub(rf'"{nome}":"[^"]*"', novo, js) if f'"{nome}":' in js else js.rstrip().rstrip('};').rstrip() + f'\n{novo},\n}};\n'
-open('fantoche-assets.js', 'w').write(js)
-```
+**Sempre que trocar, adicionar ou apagar uma imagem em `assets/pecas/` ou um som em `assets/sons/`, rode
+`python3 ferramentas/embutir.py`** na raiz. Ele regenera `fantoche-assets.js` e `miados.js`; senão a página continua
+mostrando a imagem (ou tocando o som) antigo.
 
 ## Como o motor funciona (`fantoche.js`)
 

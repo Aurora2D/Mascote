@@ -31,7 +31,6 @@ def voz(dur, f0_pts, vogais, amp_pts, vibrato=0.012, rouco=0.0, escala=1.45):
          'u': [(330, 80, 1.0), (820, 120, 0.35), (2300, 300, 0.05)]}
     seq = [(p, F[v]) for p, v in vogais]
     def formantes(i):
-        pos = np.linspace(0, 1, n)
         return [interp([(p, f[i][0] * escala) for p, f in seq], n),
                 interp([(p, f[i][1] * escala) for p, f in seq], n),
                 interp([(p, f[i][2]) for p, f in seq], n)]

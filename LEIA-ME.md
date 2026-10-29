@@ -41,7 +41,6 @@ Na pose escrita ela escreve sozinha uns 5 segundos olhando o caderno, para, olha
 **Olhos:** `abertos`, `meio`, `fechados`, `felizes`, `brilhantes`, `cima`
 **Boca:** `sorriso`, `aberta`, `o`
 
-Ela usa uma coleira vermelha com medalhão "DIVA" (peça `coleira-diva`) na sentada, na permissão e na comemoração.
 Na comemoração, as mãozinhas (`c-mao-esq`, `c-mao-dir`, recortadas do próprio `c-corpo`) balançam sozinhas.
 
 Sozinha, a gatinha respira, mexe a cabeça, balança o rabo, mexe a orelha e pisca de vez em quando.

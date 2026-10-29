@@ -28,7 +28,6 @@
     { id: 'orelhaEsq',  img: 'orelha-esq',     cx: 322, cy: 318,  w: 255, pivot: [375, 450],  rot: -9, group: 'head' },
     { id: 'orelhaDir',  img: 'orelha-dir',     cx: 688, cy: 322,  w: 265, pivot: [625, 445],  rot: 7, group: 'head' },
     { id: 'corpo',      img: 'corpo',          cx: 510, cy: 1075, w: 730, group: 'root' },
-    { id: 'coleira',    img: 'coleira-diva',  cx: 512, cy: 768,  w: 1024, group: 'root' },
     { id: 'patasTras',  img: 'patas-tras',     cx: 505, cy: 1335, w: 517, group: 'root' },
     { id: 'pataEsq',    img: 'pata-esq',       cx: 390, cy: 1120, w: 260, pivot: [390, 1120], rot: 6.2, group: 'root' },  // perna mais curta, pé alinhado ao chão
     { id: 'pataDir',    img: 'pata-dir',       cx: 610, cy: 1120, w: 225, pivot: [610, 1120], rot: -2.2, group: 'root' },

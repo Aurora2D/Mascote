@@ -7,7 +7,7 @@
  *   <script src="fantoche.js"></script>
  *   <gatinha-fantoche id="cat"></gatinha-fantoche>
  *   cat.play('tchau');  cat.play('feliz');  cat.setFace({ olhos: 'brilhantes' });
- *   cat.setPose('escrita');   // poses: 'sentada', 'escrita'
+ *   cat.setPose('escrita');   // poses: 'sentada', 'escrita', 'permissao', 'comemoracao'
  *
  * Coordenadas em pixels de uma tela de 1024 × 1536.
  */
@@ -28,9 +28,10 @@
     { id: 'orelhaEsq',  img: 'orelha-esq',     cx: 322, cy: 318,  w: 255, pivot: [375, 450],  rot: -9, group: 'head' },
     { id: 'orelhaDir',  img: 'orelha-dir',     cx: 688, cy: 322,  w: 265, pivot: [625, 445],  rot: 7, group: 'head' },
     { id: 'corpo',      img: 'corpo',          cx: 510, cy: 1075, w: 730, group: 'root' },
+    { id: 'coleira',    img: 'coleira-diva',  cx: 512, cy: 768,  w: 1024, group: 'root' },
     { id: 'patasTras',  img: 'patas-tras',     cx: 505, cy: 1335, w: 517, group: 'root' },
-    { id: 'pataEsq',    img: 'pata-esq',       cx: 390, cy: 1057, w: 300, pivot: [390, 1057], rot: 8.7, group: 'root' },  // espelho da pata branca
-    { id: 'pataDir',    img: 'pata-dir',       cx: 610, cy: 1058, w: 245, pivot: [610, 700],  rot: -3.4, group: 'root' },
+    { id: 'pataEsq',    img: 'pata-esq',       cx: 390, cy: 1120, w: 260, pivot: [390, 1120], rot: 6.2, group: 'root' },  // perna mais curta, pé alinhado ao chão
+    { id: 'pataDir',    img: 'pata-dir',       cx: 610, cy: 1120, w: 225, pivot: [610, 1120], rot: -2.2, group: 'root' },
     { id: 'cabeca',     img: 'cabeca',         cx: 505, cy: 478,  w: 615, group: 'head' },
     { id: 'bochechas',  img: 'bochechas',      cx: 506, cy: 562,  w: 415, group: 'head' },
     { id: 'olhos',      slot: 'olhos', group: 'head' },
@@ -87,7 +88,16 @@
     .filter((p) => !['corpo', 'patasTras', 'pataEsq', 'pataDir', 'pataLevantada'].includes(p.id))
     .flatMap((p) => (p.id === 'orelhaDir' ? [p, corpo] : [p]));
   const PARTS_PERMISSAO = comCorpo({ id: 'corpo', img: 'p-corpo', cx: 510.5, cy: 1034, w: 733, group: 'root' });
-  const PARTS_COMEMORACAO = comCorpo({ id: 'corpo', img: 'c-corpo', cx: 516, cy: 933.5, w: 980, group: 'root' });
+  const PARTS_COMEMORACAO = (() => {
+    const parts = comCorpo({ id: 'corpo', img: 'c-corpo', cx: 516, cy: 933.5, w: 980, group: 'root' });
+    // Ampliações discretas das mãos, recortadas diretamente do corpo original para manter a aquarela.
+    const bodyIndex = parts.findIndex((p) => p.id === 'corpo');
+    parts.splice(bodyIndex + 1, 0,
+      { id: 'maoComemoraEsq', img: 'c-mao-esq', cx: 124, cy: 506, w: 218, pivot: [124, 565], rot: -1.5, group: 'root', move: 'maoEsq' },
+      { id: 'maoComemoraDir', img: 'c-mao-dir', cx: 908, cy: 506, w: 218, pivot: [908, 565], rot: 1.5, group: 'root', move: 'maoDir' }
+    );
+    return parts;
+  })();
 
   /* Cada pose: peças, expressões, pivô da cabeça (neck), chão (ground) e
    * "fallback" = qual expressão usar quando a pose não tem a pedida. */
@@ -221,7 +231,8 @@
       this.ctx = this.canvas.getContext('2d');
       this.imgs = {}; this.running = []; this.time = 0; this.nextBlink = 1.2; this.nextEar = 4;
       this.face = { olhos: 'abertos', boca: 'sorriso' };
-      this.poseName = this.getAttribute('pose') || 'sentada'; if (!POSES[this.poseName]) this.poseName = 'sentada';  // pose que ainda não existe cai na sentada this.prevPose = null; this.fade = 1;
+      this.poseName = this.getAttribute('pose') || 'sentada'; if (!POSES[this.poseName]) this.poseName = 'sentada';  // pose que ainda não existe cai na sentada
+      this.prevPose = null; this.fade = 1;
       this.buf = [document.createElement('canvas'), document.createElement('canvas')];
       this.basePath = this.getAttribute('src-base') || 'assets/pecas/';
       this.ready = this._init();
@@ -312,6 +323,33 @@
       c.globalAlpha = a;
     }
 
+    /* Deforma o rabo em tiras finas, como uma malha 2D simples. A arte-fonte continua sendo
+       o rabo original em aquarela; só deslocamos cada faixa para obter uma curva em S suave. */
+    _drawTailMesh(p, matrix, s) {
+      const im = this.imgs[p.img]; if (!im) return;
+      const c = this._ctx || this.ctx;
+      const w = p.w, h = w * im.height / im.width;
+      const left = p.cx - w / 2, top = p.cy - h / 2;
+      const strips = 72, stripH = im.height / strips;
+      const amp = 25 + Math.min(7, Math.abs(s.rabo) * 0.45);
+      const phase = (s.rabo || 0) * 0.018;
+      c.save(); c.setTransform(matrix);
+      for (let i = 0; i < strips; i++) {
+        const sy = i * stripH, sh = Math.min(stripH + 1.25, im.height - sy);
+        const u = 1 - (sy + sh / 2) / im.height; // 0 na raiz, 1 na ponta
+        const curve = (v) => amp * Math.sin(2 * Math.PI * v + phase) * Math.sin(Math.PI * v / 2);
+        const offset = curve(u);
+        const du = 0.002;
+        const slope = (curve(Math.min(1, u + du)) - curve(Math.max(0, u - du))) / (2 * du) * (-1 / h);
+        const angle = -Math.atan(slope);
+        const dy = top + ((sy + sh / 2) / im.height) * h;
+        c.save(); c.translate(p.cx + offset, dy); c.rotate(angle);
+        c.drawImage(im, 0, sy, im.width, sh, -w / 2, -(sh / im.height * h) / 2, w, sh / im.height * h + 0.8);
+        c.restore();
+      }
+      c.restore();
+    }
+
     _frame(now) {
       const dt = Math.min(0.05, (now - this._last) / 1000); this._last = now; this.time += dt;
       // piscar e mexer orelha sozinha
@@ -363,11 +401,9 @@
         const g = base.multiply(p.group === 'head' ? headM : rootM);
         let m = g;
         let ang = p.rot || 0, alpha = 1;
-        if (p.id === 'rabo') {
-          if (P.tailRange) { // balança só dentro de uma faixa (ex.: só pra dentro, sem abrir fresta)
-            const [lo, hi] = P.tailRange, t01 = Math.min(1, Math.max(0, (s.rabo + 8) / 16));
-            ang += lo + (hi - lo) * t01;
-          } else ang += s.rabo;
+        if (p.id === 'rabo' && P.tailRange) { // balança só dentro de uma faixa (ex.: só pra dentro, sem abrir fresta)
+          const [lo, hi] = P.tailRange, t01 = Math.min(1, Math.max(0, (s.rabo + 8) / 16));
+          ang += lo + (hi - lo) * t01;
         }
         if (p.id === 'orelhaEsq') ang += s.orelhaEsq * (P.earScale || 1);
         if (p.id === 'orelhaDir') ang += s.orelhaDir * (P.earScale || 1);
@@ -376,6 +412,13 @@
         if (p.id === 'bochechas') alpha = s.bochechas * 0.9;
         if (ang && p.pivot) m = g.translate(p.pivot[0], p.pivot[1]).rotate(ang).translate(-p.pivot[0], -p.pivot[1]);
         if (p.move === 'escrita') m = m.translate(s.escritaX, s.escritaY);
+        if (p.move === 'maoEsq') m = g.translate(p.pivot[0], p.pivot[1]).rotate(Math.sin(this.time * 5.2) * 2.8).translate(-p.pivot[0], -p.pivot[1]);
+        if (p.move === 'maoDir') m = g.translate(p.pivot[0], p.pivot[1]).rotate(-Math.sin(this.time * 5.2 + 0.6) * 2.8).translate(-p.pivot[0], -p.pivot[1]);
+        // rabo em curva (malha) só onde ele pode balançar livre; com tailRange (escrita) a curva abre fresta no corpo
+        if (p.id === 'rabo' && !P.tailRange) {
+          this._drawTailMesh(p, m, s);
+          continue;
+        }
         c.setTransform(m);
         if (p.slot) {
           const set = P.slots[p.slot];
@@ -384,6 +427,13 @@
           if (v.img) this._drawImg(v.img, v.cx, v.cy, v.w);
         } else this._drawImg(p.img, p.cx, p.cy, p.w, alpha);
       }
+    }
+
+    static get observedAttributes() { return ['pose']; }
+    attributeChangedCallback(nome, antes, valor) {  // <gatinha-fantoche pose="escrita">: no construtor o atributo ainda não existe
+      if (nome !== 'pose' || !valor) return;
+      if (!this.prevPose && !this._raf) this.poseName = POSES[valor] ? valor : 'sentada';  // antes do 1º quadro: sem transição
+      else if (POSES[valor]) this.setPose(valor);
     }
 
     disconnectedCallback() { cancelAnimationFrame(this._raf); }

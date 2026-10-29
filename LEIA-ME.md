@@ -36,6 +36,9 @@ Na pose escrita ela escreve sozinha uns 5 segundos olhando o caderno, para, olha
 **Olhos:** `abertos`, `meio`, `fechados`, `felizes`, `brilhantes`, `cima`
 **Boca:** `sorriso`, `aberta`, `o`
 
+Ela usa uma coleira vermelha com medalhão "DIVA" (peça `coleira-diva`) na sentada, na permissão e na comemoração.
+Na comemoração, as mãozinhas (`c-mao-esq`, `c-mao-dir`, recortadas do próprio `c-corpo`) balançam sozinhas.
+
 Sozinha, a gatinha respira, mexe a cabeça, balança o rabo, mexe a orelha e pisca de vez em quando.
 
 ## Criar uma ação nova
@@ -56,6 +59,9 @@ Estado disponível: `cabeca`, `orelhaEsq`, `orelhaDir`, `rabo`, `pata` (graus), 
 ## Ajustar a montagem
 Cada peça em `PARTS` tem centro (`cx`, `cy`), largura (`w`), ponto de giro (`pivot`) e inclinação fixa (`rot`),
 em pixels de uma tela de 1024 × 1536.
+
+O rabo da sentada, da permissão e da comemoração é desenhado em tiras finas que formam uma curva (`_drawTailMesh` no `fantoche.js`):
+ele dobra como rabo de verdade, usando a aquarela original. Na escrita o rabo continua girando inteiro, dentro do `tailRange`.
 
 O desenho tem uma folga invisível dos lados (`FOLGA` no `fantoche.js`): o rabo pode passar da caixa do elemento quando balança, sem ser cortado. Só não coloque a gatinha dentro de algo com `overflow: hidden` se quiser o rabo inteiro.
 
